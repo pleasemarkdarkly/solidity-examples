@@ -32,3 +32,7 @@ echo https://ropsten.etherscan.io/address/0x0F3CA246a7A3043FF92Ff46B63F93752688b
 
 # Trigger the Setup function in the Sale Contract
 Navigate to the [Sale Contract](https://ropsten.etherscan.io/address/0xb92B3B34b5f5269407B7A24e1Cb98c553eFC41B4#code) page, and select the tab `Contract` and `Write Contract`. Find the function `setup` and enter in the `token address above` and the `_endBlock`. __(Locating the current block height plus number of days you want your ICO to run multiplied by 5760 )__ 
+
+<div style="text-align:center">
+<img src="../images/etherscan-setup.jpeg" width=600>
+</div>

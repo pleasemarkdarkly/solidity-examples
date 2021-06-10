@@ -1,4 +1,5 @@
-pragma solidity ^0.4.25;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
 
 contract Lottery{
     
@@ -8,9 +9,13 @@ contract Lottery{
     mapping (address => bool) participated;
     enum State {Accepting, Distributing, Paid}
     State state;
-    constructor() public{
+    
+    constructor(){
         state = State.Accepting;
     }
+
+    fallback() external payable { }
+
     function wager() public payable joinable{
         if(msg.value > 0){
             if(participated[msg.sender] == false){
@@ -42,7 +47,8 @@ contract Lottery{
     }
     function selectWinner() private isFinished{
         uint winner = random()%5;
-        players[winner].transfer(totalAmount);
+        // TODO:
+        // players[winner].transfer(totalAmount);
         state = State.Paid;
         restart();
     }
@@ -56,8 +62,9 @@ contract Lottery{
         state = State.Accepting;
     }
     
-    function random () private view returns(uint) {
-        return uint(keccak256(block.difficulty, now, 5));
+    function random () private view returns (uint) {
+        // TODO: Update randomness
+        // return uint(keccak256(block.difficulty, block.timestamp, 5));
+        return 1;
     }
-
 }
