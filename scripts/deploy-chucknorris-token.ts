@@ -23,7 +23,7 @@ if (VERBOSE && ALCHEMY_API_URL && ETH_PUBLIC_KEY) {
 };
 
 const web3 = createAlchemyWeb3(ALCHEMY_API_URL);
-const local_contract = require(resolve(__dirname, `../artifacts/contracts/MeowToken.sol/MeowToken.json`));
+const local_contract = require(resolve(__dirname, `../artifacts/contracts/TemplateToken_v2.sol/ChuckNorrisToken.json`));
 if (local_contract) {
     console.log(`Loaded:${local_contract.contractName} (${local_contract.sourceName})`);
 }

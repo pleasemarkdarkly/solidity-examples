@@ -14,6 +14,6 @@ contract InterviewToken is ERC20 {
         _mint(msg.sender, supply * 10 ** uint(decimals()));
         emit Log("_mint", supply * 10 ** uint(decimals()));
         require(balanceOf(msg.sender) == supply * 10 ** uint(decimals()), 
-            "msg.sender should have the token supply");
+            "Total supply balance is off");
     }
 }

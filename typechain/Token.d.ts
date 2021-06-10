@@ -9,16 +9,15 @@ import {
   BigNumber,
   BigNumberish,
   PopulatedTransaction,
-} from "ethers";
-import {
-  Contract,
+  BaseContract,
   ContractTransaction,
   Overrides,
   CallOverrides,
-} from "@ethersproject/contracts";
+} from "ethers";
 import { BytesLike } from "@ethersproject/bytes";
 import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
+import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface TokenInterface extends ethers.utils.Interface {
   functions: {
@@ -130,245 +129,128 @@ interface TokenInterface extends ethers.utils.Interface {
 
   events: {
     "Approval(address,address,uint256)": EventFragment;
+    "Log(bool,bytes,address,uint256)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Log"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
 }
 
-export class Token extends Contract {
+export class Token extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  on(event: EventFilter | string, listener: Listener): this;
-  once(event: EventFilter | string, listener: Listener): this;
-  addListener(eventName: EventFilter | string, listener: Listener): this;
-  removeAllListeners(eventName: EventFilter | string): this;
-  removeListener(eventName: any, listener: Listener): this;
+  listeners<EventArgsArray extends Array<any>, EventArgsObject>(
+    eventFilter?: TypedEventFilter<EventArgsArray, EventArgsObject>
+  ): Array<TypedListener<EventArgsArray, EventArgsObject>>;
+  off<EventArgsArray extends Array<any>, EventArgsObject>(
+    eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
+    listener: TypedListener<EventArgsArray, EventArgsObject>
+  ): this;
+  on<EventArgsArray extends Array<any>, EventArgsObject>(
+    eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
+    listener: TypedListener<EventArgsArray, EventArgsObject>
+  ): this;
+  once<EventArgsArray extends Array<any>, EventArgsObject>(
+    eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
+    listener: TypedListener<EventArgsArray, EventArgsObject>
+  ): this;
+  removeListener<EventArgsArray extends Array<any>, EventArgsObject>(
+    eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
+    listener: TypedListener<EventArgsArray, EventArgsObject>
+  ): this;
+  removeAllListeners<EventArgsArray extends Array<any>, EventArgsObject>(
+    eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>
+  ): this;
+
+  listeners(eventName?: string): Array<Listener>;
+  off(eventName: string, listener: Listener): this;
+  on(eventName: string, listener: Listener): this;
+  once(eventName: string, listener: Listener): this;
+  removeListener(eventName: string, listener: Listener): this;
+  removeAllListeners(eventName?: string): this;
+
+  queryFilter<EventArgsArray extends Array<any>, EventArgsObject>(
+    event: TypedEventFilter<EventArgsArray, EventArgsObject>,
+    fromBlockOrBlockhash?: string | number | undefined,
+    toBlock?: string | number | undefined
+  ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
 
   interface: TokenInterface;
 
   functions: {
-    TOTAL_SUPPLY(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: BigNumber;
-    }>;
+    TOTAL_SUPPLY(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "TOTAL_SUPPLY()"(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: BigNumber;
-    }>;
-
-    allowTransfer(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: boolean;
-    }>;
-
-    "allowTransfer()"(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: boolean;
-    }>;
+    allowTransfer(overrides?: CallOverrides): Promise<[boolean]>;
 
     allowance(
       _owner: string,
       _spender: string,
       overrides?: CallOverrides
-    ): Promise<{
-      remaining: BigNumber;
-      0: BigNumber;
-    }>;
-
-    "allowance(address,address)"(
-      _owner: string,
-      _spender: string,
-      overrides?: CallOverrides
-    ): Promise<{
-      remaining: BigNumber;
-      0: BigNumber;
-    }>;
+    ): Promise<[BigNumber] & { remaining: BigNumber }>;
 
     approve(
       _spender: string,
       _value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "approve(address,uint256)"(
-      _spender: string,
-      _value: BigNumberish,
-      overrides?: Overrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     approveAndCall(
       _spender: string,
       _value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "approveAndCall(address,uint256)"(
-      _spender: string,
-      _value: BigNumberish,
-      overrides?: Overrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     balanceOf(
       _owner: string,
       overrides?: CallOverrides
-    ): Promise<{
-      balance: BigNumber;
-      0: BigNumber;
-    }>;
-
-    "balanceOf(address)"(
-      _owner: string,
-      overrides?: CallOverrides
-    ): Promise<{
-      balance: BigNumber;
-      0: BigNumber;
-    }>;
+    ): Promise<[BigNumber] & { balance: BigNumber }>;
 
     changeTransfer(
       allowed: boolean,
-      overrides?: Overrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "changeTransfer(bool)"(
-      allowed: boolean,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    decimals(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: number;
-    }>;
-
-    "decimals()"(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: number;
-    }>;
+    decimals(overrides?: CallOverrides): Promise<[number]>;
 
     mintToken(
       to: string,
       amount: BigNumberish,
-      overrides?: Overrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "mintToken(address,uint256)"(
-      to: string,
-      amount: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
+    mintableAddress(overrides?: CallOverrides): Promise<[string]>;
 
-    mintableAddress(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: string;
-    }>;
+    name(overrides?: CallOverrides): Promise<[string]>;
 
-    "mintableAddress()"(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: string;
-    }>;
+    symbol(overrides?: CallOverrides): Promise<[string]>;
 
-    name(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: string;
-    }>;
-
-    "name()"(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: string;
-    }>;
-
-    symbol(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: string;
-    }>;
-
-    "symbol()"(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: string;
-    }>;
-
-    totalSupply(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: BigNumber;
-    }>;
-
-    "totalSupply()"(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: BigNumber;
-    }>;
+    totalSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     transfer(
       _to: string,
       _value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "transfer(address,uint256)"(
-      _to: string,
-      _value: BigNumberish,
-      overrides?: Overrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     transferFrom(
       _from: string,
       _to: string,
       _value: BigNumberish,
-      overrides?: Overrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "transferFrom(address,address,uint256)"(
-      _from: string,
-      _to: string,
-      _value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    version(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: string;
-    }>;
-
-    "version()"(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: string;
-    }>;
+    version(overrides?: CallOverrides): Promise<[string]>;
   };
 
   TOTAL_SUPPLY(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "TOTAL_SUPPLY()"(overrides?: CallOverrides): Promise<BigNumber>;
-
   allowTransfer(overrides?: CallOverrides): Promise<boolean>;
 
-  "allowTransfer()"(overrides?: CallOverrides): Promise<boolean>;
-
   allowance(
-    _owner: string,
-    _spender: string,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  "allowance(address,address)"(
     _owner: string,
     _spender: string,
     overrides?: CallOverrides
@@ -377,122 +259,59 @@ export class Token extends Contract {
   approve(
     _spender: string,
     _value: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "approve(address,uint256)"(
-    _spender: string,
-    _value: BigNumberish,
-    overrides?: Overrides
+    overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   approveAndCall(
     _spender: string,
     _value: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "approveAndCall(address,uint256)"(
-    _spender: string,
-    _value: BigNumberish,
-    overrides?: Overrides
+    overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   balanceOf(_owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-  "balanceOf(address)"(
-    _owner: string,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
   changeTransfer(
     allowed: boolean,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "changeTransfer(bool)"(
-    allowed: boolean,
-    overrides?: Overrides
+    overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   decimals(overrides?: CallOverrides): Promise<number>;
 
-  "decimals()"(overrides?: CallOverrides): Promise<number>;
-
   mintToken(
     to: string,
     amount: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "mintToken(address,uint256)"(
-    to: string,
-    amount: BigNumberish,
-    overrides?: Overrides
+    overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   mintableAddress(overrides?: CallOverrides): Promise<string>;
 
-  "mintableAddress()"(overrides?: CallOverrides): Promise<string>;
-
   name(overrides?: CallOverrides): Promise<string>;
-
-  "name()"(overrides?: CallOverrides): Promise<string>;
 
   symbol(overrides?: CallOverrides): Promise<string>;
 
-  "symbol()"(overrides?: CallOverrides): Promise<string>;
-
   totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
-
-  "totalSupply()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   transfer(
     _to: string,
     _value: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "transfer(address,uint256)"(
-    _to: string,
-    _value: BigNumberish,
-    overrides?: Overrides
+    overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   transferFrom(
     _from: string,
     _to: string,
     _value: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "transferFrom(address,address,uint256)"(
-    _from: string,
-    _to: string,
-    _value: BigNumberish,
-    overrides?: Overrides
+    overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   version(overrides?: CallOverrides): Promise<string>;
 
-  "version()"(overrides?: CallOverrides): Promise<string>;
-
   callStatic: {
     TOTAL_SUPPLY(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "TOTAL_SUPPLY()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     allowTransfer(overrides?: CallOverrides): Promise<boolean>;
 
-    "allowTransfer()"(overrides?: CallOverrides): Promise<boolean>;
-
     allowance(
-      _owner: string,
-      _spender: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "allowance(address,address)"(
       _owner: string,
       _spender: string,
       overrides?: CallOverrides
@@ -504,19 +323,7 @@ export class Token extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "approve(address,uint256)"(
-      _spender: string,
-      _value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
     approveAndCall(
-      _spender: string,
-      _value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
-    "approveAndCall(address,uint256)"(
       _spender: string,
       _value: BigNumberish,
       overrides?: CallOverrides
@@ -524,29 +331,11 @@ export class Token extends Contract {
 
     balanceOf(_owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    "balanceOf(address)"(
-      _owner: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     changeTransfer(allowed: boolean, overrides?: CallOverrides): Promise<void>;
-
-    "changeTransfer(bool)"(
-      allowed: boolean,
-      overrides?: CallOverrides
-    ): Promise<void>;
 
     decimals(overrides?: CallOverrides): Promise<number>;
 
-    "decimals()"(overrides?: CallOverrides): Promise<number>;
-
     mintToken(
-      to: string,
-      amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
-    "mintToken(address,uint256)"(
       to: string,
       amount: BigNumberish,
       overrides?: CallOverrides
@@ -554,19 +343,11 @@ export class Token extends Contract {
 
     mintableAddress(overrides?: CallOverrides): Promise<string>;
 
-    "mintableAddress()"(overrides?: CallOverrides): Promise<string>;
-
     name(overrides?: CallOverrides): Promise<string>;
-
-    "name()"(overrides?: CallOverrides): Promise<string>;
 
     symbol(overrides?: CallOverrides): Promise<string>;
 
-    "symbol()"(overrides?: CallOverrides): Promise<string>;
-
     totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "totalSupply()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     transfer(
       _to: string,
@@ -574,20 +355,7 @@ export class Token extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "transfer(address,uint256)"(
-      _to: string,
-      _value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
     transferFrom(
-      _from: string,
-      _to: string,
-      _value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
-    "transferFrom(address,address,uint256)"(
       _from: string,
       _to: string,
       _value: BigNumberish,
@@ -595,40 +363,44 @@ export class Token extends Contract {
     ): Promise<boolean>;
 
     version(overrides?: CallOverrides): Promise<string>;
-
-    "version()"(overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {
     Approval(
-      _owner: string | null,
-      _spender: string | null,
-      _value: null
-    ): EventFilter;
+      _owner?: string | null,
+      _spender?: string | null,
+      _value?: null
+    ): TypedEventFilter<
+      [string, string, BigNumber],
+      { _owner: string; _spender: string; _value: BigNumber }
+    >;
+
+    Log(
+      success?: null,
+      data?: null,
+      _from?: null,
+      amount?: null
+    ): TypedEventFilter<
+      [boolean, string, string, BigNumber],
+      { success: boolean; data: string; _from: string; amount: BigNumber }
+    >;
 
     Transfer(
-      _from: string | null,
-      _to: string | null,
-      _value: null
-    ): EventFilter;
+      _from?: string | null,
+      _to?: string | null,
+      _value?: null
+    ): TypedEventFilter<
+      [string, string, BigNumber],
+      { _from: string; _to: string; _value: BigNumber }
+    >;
   };
 
   estimateGas: {
     TOTAL_SUPPLY(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "TOTAL_SUPPLY()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     allowTransfer(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "allowTransfer()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     allowance(
-      _owner: string,
-      _spender: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "allowance(address,address)"(
       _owner: string,
       _spender: string,
       overrides?: CallOverrides
@@ -637,120 +409,60 @@ export class Token extends Contract {
     approve(
       _spender: string,
       _value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "approve(address,uint256)"(
-      _spender: string,
-      _value: BigNumberish,
-      overrides?: Overrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     approveAndCall(
       _spender: string,
       _value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "approveAndCall(address,uint256)"(
-      _spender: string,
-      _value: BigNumberish,
-      overrides?: Overrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     balanceOf(_owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    "balanceOf(address)"(
-      _owner: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    changeTransfer(allowed: boolean, overrides?: Overrides): Promise<BigNumber>;
-
-    "changeTransfer(bool)"(
+    changeTransfer(
       allowed: boolean,
-      overrides?: Overrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     decimals(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "decimals()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     mintToken(
       to: string,
       amount: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "mintToken(address,uint256)"(
-      to: string,
-      amount: BigNumberish,
-      overrides?: Overrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     mintableAddress(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "mintableAddress()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     name(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "name()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     symbol(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "symbol()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "totalSupply()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     transfer(
       _to: string,
       _value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "transfer(address,uint256)"(
-      _to: string,
-      _value: BigNumberish,
-      overrides?: Overrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     transferFrom(
       _from: string,
       _to: string,
       _value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "transferFrom(address,address,uint256)"(
-      _from: string,
-      _to: string,
-      _value: BigNumberish,
-      overrides?: Overrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     version(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "version()"(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
     TOTAL_SUPPLY(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "TOTAL_SUPPLY()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     allowTransfer(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "allowTransfer()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     allowance(
-      _owner: string,
-      _spender: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "allowance(address,address)"(
       _owner: string,
       _spender: string,
       overrides?: CallOverrides
@@ -759,25 +471,13 @@ export class Token extends Contract {
     approve(
       _spender: string,
       _value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "approve(address,uint256)"(
-      _spender: string,
-      _value: BigNumberish,
-      overrides?: Overrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     approveAndCall(
       _spender: string,
       _value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "approveAndCall(address,uint256)"(
-      _spender: string,
-      _value: BigNumberish,
-      overrides?: Overrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     balanceOf(
@@ -785,83 +485,40 @@ export class Token extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "balanceOf(address)"(
-      _owner: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     changeTransfer(
       allowed: boolean,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "changeTransfer(bool)"(
-      allowed: boolean,
-      overrides?: Overrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     decimals(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "decimals()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     mintToken(
       to: string,
       amount: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "mintToken(address,uint256)"(
-      to: string,
-      amount: BigNumberish,
-      overrides?: Overrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     mintableAddress(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "mintableAddress()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "name()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "symbol()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     totalSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "totalSupply()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     transfer(
       _to: string,
       _value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "transfer(address,uint256)"(
-      _to: string,
-      _value: BigNumberish,
-      overrides?: Overrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     transferFrom(
       _from: string,
       _to: string,
       _value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "transferFrom(address,address,uint256)"(
-      _from: string,
-      _to: string,
-      _value: BigNumberish,
-      overrides?: Overrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     version(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "version()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

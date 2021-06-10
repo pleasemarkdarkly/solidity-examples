@@ -1,3 +1,9 @@
+import '@nomiclabs/hardhat-waffle';
+import "@typechain/hardhat";
+import '@nomiclabs/hardhat-etherscan';
+import '@openzeppelin/hardhat-upgrades';
+import 'hardhat-gas-reporter';
+import "solidity-coverage";
 import { extendEnvironment, task } from 'hardhat/config';
 import { lazyObject } from "hardhat/plugins";
 import { config as dotenvConfig } from 'dotenv';
@@ -11,12 +17,6 @@ dotenvConfig({ path: resolve(__dirname, './.env') });
 import { HardhatUserConfig } from 'hardhat/types';
 import { NetworkUserConfig } from 'hardhat/types';
 
-import '@nomiclabs/hardhat-waffle';
-import 'hardhat-typechain';
-import 'hardhat-gas-reporter';
-import '@nomiclabs/hardhat-etherscan';
-import '@openzeppelin/hardhat-upgrades';
-
 const chainIds = {
   ganache: 1337,
   goerli: 5,
@@ -29,7 +29,10 @@ const chainIds = {
 };
 
 const VERBOSE = false;
-const MNEMONIC = process.env.MNEMONIC || '';
+const mnemonic = process.env.MNEMONIC || '';
+if (!mnemonic) {
+  throw new Error("Please set your MNEMONIC in a .env file");
+}
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || '';
 const INFURA_API_KEY = process.env.INFURA_API_KEY || '';
 const ALCHEMY_API_URL = process.env.ALCHEMY_API_URL || '';
@@ -102,7 +105,7 @@ const createTestnetConfig = (
     accounts: {
       count: 10,
       initialIndex: 0,      
-      mnemonic: MNEMONIC,
+      mnemonic,
       path: "m/44'/60'/0'/0",
     },
     chainId: chainIds[network],
@@ -116,10 +119,17 @@ const createTestnetConfig = (
   Go to https://hardhat.org/config/ to learn more */
 const config: HardhatUserConfig = {
   defaultNetwork: 'hardhat',
+  gasReporter: {
+    currency: 'USD',
+    gasPrice: 100,
+    enabled: process.env.REPORT_GAS ? true : false,
+    excludeContracts: [],
+    src: "./contracts",
+  },
   networks: {
     hardhat: {
       accounts: {
-        mnemonic: MNEMONIC,
+        mnemonic: mnemonic,
       },
       chainId: chainIds.hardhat,
     },
@@ -131,20 +141,36 @@ const config: HardhatUserConfig = {
   },
   solidity: {
     compilers: [
-      { version: '0.8.4', },
+      {
+        version: '0.8.4',
+        settings: {
+          metadata: {
+            // Not including the metadata hash
+            // https://github.com/paulrberg/solidity-template/issues/31
+            bytecodeHash: "none",
+          },
+          // You should disable the optimizer when debugging
+          // https://hardhat.org/hardhat-network/#solidity-optimizer-support
+          optimizer: {
+            enabled: true,
+            runs: 800,
+          },
+        },
+      },
       { version: '0.6.12', },
       { version: '0.6.6', },
-      { version: '0.4.21', },
+      { version: '0.4.21', },      
     ],
   },
   etherscan: {
     apiKey: ETHERSCAN_API_KEY,
   },
-  gasReporter: {
-    currency: 'USD',
-    gasPrice: 100,
-    enabled: process.env.REPORT_GAS ? true : false,
-  },
+  paths: {
+    artifacts: "./artifacts",
+    cache: "./cache",
+    sources: "./contracts",
+    tests: "./test",
+  }  
 };
 
 export default config;

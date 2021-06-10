@@ -11,7 +11,7 @@ async function main(): Promise<void> {
     If this runs in a standalone fashion you may want to call compile manually
     to make sure everything is compiled
     await run("compile"); We get the contract to deploy */
-    const TemplateSaleFactory: ContractFactory = await ethers.getContractFactory('Sale');
+    const TemplateSaleFactory: ContractFactory = await ethers.getContractFactory('TemplateSale_v0');
     const templateSale: Contract = await TemplateSaleFactory.deploy("0x6FEFc3F6239F2A1aF8Fe093877BA2a1e81da4231");
     await templateSale.deployed();
     console.log('Token Sale deployed to: ', templateSale.address);

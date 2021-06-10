@@ -4,21 +4,21 @@
 export type { AccessControl } from "./AccessControl";
 export type { ERC20 } from "./ERC20";
 export type { IERC20 } from "./IERC20";
-export type { ERC20 } from "./ERC20";
+export type { Base } from "./Base";
 export type { Sale } from "./Sale";
 export type { BasicToken } from "./BasicToken";
 export type { StandardToken } from "./StandardToken";
 export type { Token } from "./Token";
 export type { InterviewToken } from "./InterviewToken";
-export type { TemplateToken } from "./TemplateToken";
+export type { ChuckNorrisToken } from "./ChuckNorrisToken";
 
 export { AccessControl__factory } from "./factories/AccessControl__factory";
 export { ERC20__factory } from "./factories/ERC20__factory";
 export { IERC20__factory } from "./factories/IERC20__factory";
-export { ERC20__factory } from "./factories/ERC20__factory";
+export { Base__factory } from "./factories/Base__factory";
 export { Sale__factory } from "./factories/Sale__factory";
 export { BasicToken__factory } from "./factories/BasicToken__factory";
 export { StandardToken__factory } from "./factories/StandardToken__factory";
 export { Token__factory } from "./factories/Token__factory";
 export { InterviewToken__factory } from "./factories/InterviewToken__factory";
-export { TemplateToken__factory } from "./factories/TemplateToken__factory";
+export { ChuckNorrisToken__factory } from "./factories/ChuckNorrisToken__factory";

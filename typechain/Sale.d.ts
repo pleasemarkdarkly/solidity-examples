@@ -9,17 +9,16 @@ import {
   BigNumber,
   BigNumberish,
   PopulatedTransaction,
-} from "ethers";
-import {
-  Contract,
+  BaseContract,
   ContractTransaction,
   Overrides,
   PayableOverrides,
   CallOverrides,
-} from "@ethersproject/contracts";
+} from "ethers";
 import { BytesLike } from "@ethersproject/bytes";
 import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
+import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface SaleInterface extends ethers.utils.Interface {
   functions: {
@@ -171,706 +170,364 @@ interface SaleInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "ReleaseTokens"): EventFragment;
 }
 
-export class Sale extends Contract {
+export class Sale extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  on(event: EventFilter | string, listener: Listener): this;
-  once(event: EventFilter | string, listener: Listener): this;
-  addListener(eventName: EventFilter | string, listener: Listener): this;
-  removeAllListeners(eventName: EventFilter | string): this;
-  removeListener(eventName: any, listener: Listener): this;
+  listeners<EventArgsArray extends Array<any>, EventArgsObject>(
+    eventFilter?: TypedEventFilter<EventArgsArray, EventArgsObject>
+  ): Array<TypedListener<EventArgsArray, EventArgsObject>>;
+  off<EventArgsArray extends Array<any>, EventArgsObject>(
+    eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
+    listener: TypedListener<EventArgsArray, EventArgsObject>
+  ): this;
+  on<EventArgsArray extends Array<any>, EventArgsObject>(
+    eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
+    listener: TypedListener<EventArgsArray, EventArgsObject>
+  ): this;
+  once<EventArgsArray extends Array<any>, EventArgsObject>(
+    eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
+    listener: TypedListener<EventArgsArray, EventArgsObject>
+  ): this;
+  removeListener<EventArgsArray extends Array<any>, EventArgsObject>(
+    eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
+    listener: TypedListener<EventArgsArray, EventArgsObject>
+  ): this;
+  removeAllListeners<EventArgsArray extends Array<any>, EventArgsObject>(
+    eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>
+  ): this;
+
+  listeners(eventName?: string): Array<Listener>;
+  off(eventName: string, listener: Listener): this;
+  on(eventName: string, listener: Listener): this;
+  once(eventName: string, listener: Listener): this;
+  removeListener(eventName: string, listener: Listener): this;
+  removeAllListeners(eventName?: string): this;
+
+  queryFilter<EventArgsArray extends Array<any>, EventArgsObject>(
+    event: TypedEventFilter<EventArgsArray, EventArgsObject>,
+    fromBlockOrBlockhash?: string | number | undefined,
+    toBlock?: string | number | undefined
+  ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
 
   interface: SaleInterface;
 
   functions: {
-    ETHWallet(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: string;
-    }>;
+    ETHWallet(overrides?: CallOverrides): Promise<[string]>;
 
-    "ETHWallet()"(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: string;
-    }>;
+    EXCHANGE_RATE(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    EXCHANGE_RATE(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: BigNumber;
-    }>;
+    TOTAL_SUPPLY(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "EXCHANGE_RATE()"(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: BigNumber;
-    }>;
-
-    TOTAL_SUPPLY(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: BigNumber;
-    }>;
-
-    "TOTAL_SUPPLY()"(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: BigNumber;
-    }>;
-
-    Token(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: string;
-    }>;
-
-    "Token()"(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: string;
-    }>;
+    Token(overrides?: CallOverrides): Promise<[string]>;
 
     changeCreator(
       _creator: string,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "changeCreator(address)"(
-      _creator: string,
-      overrides?: Overrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     changeTransferStats(
       _allowed: boolean,
-      overrides?: Overrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "changeTransferStats(bool)"(
-      _allowed: boolean,
-      overrides?: Overrides
+    closeSale(
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    closeSale(overrides?: Overrides): Promise<ContractTransaction>;
+    contribute(
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
-    "closeSale()"(overrides?: Overrides): Promise<ContractTransaction>;
+    creator(overrides?: CallOverrides): Promise<[string]>;
 
-    contribute(overrides?: PayableOverrides): Promise<ContractTransaction>;
+    endBlock(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "contribute()"(overrides?: PayableOverrides): Promise<ContractTransaction>;
-
-    creator(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: string;
-    }>;
-
-    "creator()"(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: string;
-    }>;
-
-    endBlock(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: BigNumber;
-    }>;
-
-    "endBlock()"(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: BigNumber;
-    }>;
-
-    exchangeRate(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: BigNumber;
-    }>;
-
-    "exchangeRate()"(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: BigNumber;
-    }>;
+    exchangeRate(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     getHeldCoin(
       _address: string,
-      overrides?: PayableOverrides
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "getHeldCoin(address)"(
-      _address: string,
-      overrides?: PayableOverrides
+    heldTimeline(arg0: string, overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    heldTokens(arg0: string, overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    heldTotal(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    isFunding(overrides?: CallOverrides): Promise<[boolean]>;
+
+    maxMintable(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    releaseHeldCoins(
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
-
-    heldTimeline(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<{
-      0: BigNumber;
-    }>;
-
-    "heldTimeline(address)"(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<{
-      0: BigNumber;
-    }>;
-
-    heldTokens(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<{
-      0: BigNumber;
-    }>;
-
-    "heldTokens(address)"(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<{
-      0: BigNumber;
-    }>;
-
-    heldTotal(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: BigNumber;
-    }>;
-
-    "heldTotal()"(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: BigNumber;
-    }>;
-
-    isFunding(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: boolean;
-    }>;
-
-    "isFunding()"(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: boolean;
-    }>;
-
-    maxMintable(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: BigNumber;
-    }>;
-
-    "maxMintable()"(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: BigNumber;
-    }>;
-
-    releaseHeldCoins(overrides?: Overrides): Promise<ContractTransaction>;
-
-    "releaseHeldCoins()"(overrides?: Overrides): Promise<ContractTransaction>;
 
     setup(
-      token_address: string,
-      end_block: BigNumberish,
-      overrides?: Overrides
+      tokenAddress: string,
+      _endBlock: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "setup(address,uint256)"(
-      token_address: string,
-      end_block: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
+    startBlock(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    startBlock(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: BigNumber;
-    }>;
-
-    "startBlock()"(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: BigNumber;
-    }>;
-
-    totalMinted(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: BigNumber;
-    }>;
-
-    "totalMinted()"(
-      overrides?: CallOverrides
-    ): Promise<{
-      0: BigNumber;
-    }>;
+    totalMinted(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     updateRate(
       rate: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "updateRate(uint256)"(
-      rate: BigNumberish,
-      overrides?: Overrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
 
   ETHWallet(overrides?: CallOverrides): Promise<string>;
 
-  "ETHWallet()"(overrides?: CallOverrides): Promise<string>;
-
   EXCHANGE_RATE(overrides?: CallOverrides): Promise<BigNumber>;
-
-  "EXCHANGE_RATE()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   TOTAL_SUPPLY(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "TOTAL_SUPPLY()"(overrides?: CallOverrides): Promise<BigNumber>;
-
   Token(overrides?: CallOverrides): Promise<string>;
-
-  "Token()"(overrides?: CallOverrides): Promise<string>;
 
   changeCreator(
     _creator: string,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "changeCreator(address)"(
-    _creator: string,
-    overrides?: Overrides
+    overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   changeTransferStats(
     _allowed: boolean,
-    overrides?: Overrides
+    overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "changeTransferStats(bool)"(
-    _allowed: boolean,
-    overrides?: Overrides
+  closeSale(
+    overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  closeSale(overrides?: Overrides): Promise<ContractTransaction>;
-
-  "closeSale()"(overrides?: Overrides): Promise<ContractTransaction>;
-
-  contribute(overrides?: PayableOverrides): Promise<ContractTransaction>;
-
-  "contribute()"(overrides?: PayableOverrides): Promise<ContractTransaction>;
+  contribute(
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   creator(overrides?: CallOverrides): Promise<string>;
 
-  "creator()"(overrides?: CallOverrides): Promise<string>;
-
   endBlock(overrides?: CallOverrides): Promise<BigNumber>;
-
-  "endBlock()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   exchangeRate(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "exchangeRate()"(overrides?: CallOverrides): Promise<BigNumber>;
-
   getHeldCoin(
     _address: string,
-    overrides?: PayableOverrides
-  ): Promise<ContractTransaction>;
-
-  "getHeldCoin(address)"(
-    _address: string,
-    overrides?: PayableOverrides
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   heldTimeline(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-  "heldTimeline(address)"(
-    arg0: string,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
   heldTokens(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-  "heldTokens(address)"(
-    arg0: string,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
 
   heldTotal(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "heldTotal()"(overrides?: CallOverrides): Promise<BigNumber>;
-
   isFunding(overrides?: CallOverrides): Promise<boolean>;
-
-  "isFunding()"(overrides?: CallOverrides): Promise<boolean>;
 
   maxMintable(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "maxMintable()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-  releaseHeldCoins(overrides?: Overrides): Promise<ContractTransaction>;
-
-  "releaseHeldCoins()"(overrides?: Overrides): Promise<ContractTransaction>;
-
-  setup(
-    token_address: string,
-    end_block: BigNumberish,
-    overrides?: Overrides
+  releaseHeldCoins(
+    overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "setup(address,uint256)"(
-    token_address: string,
-    end_block: BigNumberish,
-    overrides?: Overrides
+  setup(
+    tokenAddress: string,
+    _endBlock: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   startBlock(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "startBlock()"(overrides?: CallOverrides): Promise<BigNumber>;
-
   totalMinted(overrides?: CallOverrides): Promise<BigNumber>;
-
-  "totalMinted()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   updateRate(
     rate: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "updateRate(uint256)"(
-    rate: BigNumberish,
-    overrides?: Overrides
+    overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   callStatic: {
     ETHWallet(overrides?: CallOverrides): Promise<string>;
 
-    "ETHWallet()"(overrides?: CallOverrides): Promise<string>;
-
     EXCHANGE_RATE(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "EXCHANGE_RATE()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     TOTAL_SUPPLY(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "TOTAL_SUPPLY()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     Token(overrides?: CallOverrides): Promise<string>;
-
-    "Token()"(overrides?: CallOverrides): Promise<string>;
 
     changeCreator(_creator: string, overrides?: CallOverrides): Promise<void>;
 
-    "changeCreator(address)"(
-      _creator: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     changeTransferStats(
-      _allowed: boolean,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "changeTransferStats(bool)"(
       _allowed: boolean,
       overrides?: CallOverrides
     ): Promise<void>;
 
     closeSale(overrides?: CallOverrides): Promise<void>;
 
-    "closeSale()"(overrides?: CallOverrides): Promise<void>;
-
     contribute(overrides?: CallOverrides): Promise<void>;
-
-    "contribute()"(overrides?: CallOverrides): Promise<void>;
 
     creator(overrides?: CallOverrides): Promise<string>;
 
-    "creator()"(overrides?: CallOverrides): Promise<string>;
-
     endBlock(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "endBlock()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     exchangeRate(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "exchangeRate()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     getHeldCoin(
       _address: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getHeldCoin(address)"(
-      _address: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     heldTimeline(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    "heldTimeline(address)"(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     heldTokens(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    "heldTokens(address)"(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     heldTotal(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "heldTotal()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     isFunding(overrides?: CallOverrides): Promise<boolean>;
 
-    "isFunding()"(overrides?: CallOverrides): Promise<boolean>;
-
     maxMintable(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "maxMintable()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     releaseHeldCoins(overrides?: CallOverrides): Promise<void>;
 
-    "releaseHeldCoins()"(overrides?: CallOverrides): Promise<void>;
-
     setup(
-      token_address: string,
-      end_block: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "setup(address,uint256)"(
-      token_address: string,
-      end_block: BigNumberish,
+      tokenAddress: string,
+      _endBlock: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
     startBlock(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "startBlock()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     totalMinted(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "totalMinted()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     updateRate(rate: BigNumberish, overrides?: CallOverrides): Promise<void>;
-
-    "updateRate(uint256)"(
-      rate: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
   };
 
   filters: {
-    Contribution(from: null, amount: null): EventFilter;
+    Contribution(
+      from?: null,
+      amount?: null
+    ): TypedEventFilter<
+      [string, BigNumber],
+      { from: string; amount: BigNumber }
+    >;
 
-    ReleaseTokens(from: null, amount: null): EventFilter;
+    ReleaseTokens(
+      from?: null,
+      amount?: null
+    ): TypedEventFilter<
+      [string, BigNumber],
+      { from: string; amount: BigNumber }
+    >;
   };
 
   estimateGas: {
     ETHWallet(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "ETHWallet()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     EXCHANGE_RATE(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "EXCHANGE_RATE()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     TOTAL_SUPPLY(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "TOTAL_SUPPLY()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     Token(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "Token()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    changeCreator(_creator: string, overrides?: Overrides): Promise<BigNumber>;
-
-    "changeCreator(address)"(
+    changeCreator(
       _creator: string,
-      overrides?: Overrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     changeTransferStats(
       _allowed: boolean,
-      overrides?: Overrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "changeTransferStats(bool)"(
-      _allowed: boolean,
-      overrides?: Overrides
+    closeSale(
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    closeSale(overrides?: Overrides): Promise<BigNumber>;
-
-    "closeSale()"(overrides?: Overrides): Promise<BigNumber>;
-
-    contribute(overrides?: PayableOverrides): Promise<BigNumber>;
-
-    "contribute()"(overrides?: PayableOverrides): Promise<BigNumber>;
+    contribute(
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
 
     creator(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "creator()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     endBlock(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "endBlock()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     exchangeRate(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "exchangeRate()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     getHeldCoin(
       _address: string,
-      overrides?: PayableOverrides
-    ): Promise<BigNumber>;
-
-    "getHeldCoin(address)"(
-      _address: string,
-      overrides?: PayableOverrides
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     heldTimeline(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    "heldTimeline(address)"(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     heldTokens(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    "heldTokens(address)"(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     heldTotal(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "heldTotal()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     isFunding(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "isFunding()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     maxMintable(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "maxMintable()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    releaseHeldCoins(overrides?: Overrides): Promise<BigNumber>;
-
-    "releaseHeldCoins()"(overrides?: Overrides): Promise<BigNumber>;
-
-    setup(
-      token_address: string,
-      end_block: BigNumberish,
-      overrides?: Overrides
+    releaseHeldCoins(
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "setup(address,uint256)"(
-      token_address: string,
-      end_block: BigNumberish,
-      overrides?: Overrides
+    setup(
+      tokenAddress: string,
+      _endBlock: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     startBlock(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "startBlock()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     totalMinted(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "totalMinted()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    updateRate(rate: BigNumberish, overrides?: Overrides): Promise<BigNumber>;
-
-    "updateRate(uint256)"(
+    updateRate(
       rate: BigNumberish,
-      overrides?: Overrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
     ETHWallet(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "ETHWallet()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     EXCHANGE_RATE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "EXCHANGE_RATE()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     TOTAL_SUPPLY(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "TOTAL_SUPPLY()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     Token(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "Token()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     changeCreator(
       _creator: string,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "changeCreator(address)"(
-      _creator: string,
-      overrides?: Overrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     changeTransferStats(
       _allowed: boolean,
-      overrides?: Overrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "changeTransferStats(bool)"(
-      _allowed: boolean,
-      overrides?: Overrides
+    closeSale(
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    closeSale(overrides?: Overrides): Promise<PopulatedTransaction>;
-
-    "closeSale()"(overrides?: Overrides): Promise<PopulatedTransaction>;
-
-    contribute(overrides?: PayableOverrides): Promise<PopulatedTransaction>;
-
-    "contribute()"(overrides?: PayableOverrides): Promise<PopulatedTransaction>;
+    contribute(
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
 
     creator(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "creator()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     endBlock(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "endBlock()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     exchangeRate(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "exchangeRate()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     getHeldCoin(
       _address: string,
-      overrides?: PayableOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "getHeldCoin(address)"(
-      _address: string,
-      overrides?: PayableOverrides
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     heldTimeline(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "heldTimeline(address)"(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -880,55 +537,29 @@ export class Sale extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "heldTokens(address)"(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     heldTotal(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "heldTotal()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     isFunding(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "isFunding()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     maxMintable(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "maxMintable()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    releaseHeldCoins(overrides?: Overrides): Promise<PopulatedTransaction>;
-
-    "releaseHeldCoins()"(overrides?: Overrides): Promise<PopulatedTransaction>;
-
-    setup(
-      token_address: string,
-      end_block: BigNumberish,
-      overrides?: Overrides
+    releaseHeldCoins(
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "setup(address,uint256)"(
-      token_address: string,
-      end_block: BigNumberish,
-      overrides?: Overrides
+    setup(
+      tokenAddress: string,
+      _endBlock: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     startBlock(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "startBlock()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     totalMinted(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "totalMinted()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     updateRate(
       rate: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "updateRate(uint256)"(
-      rate: BigNumberish,
-      overrides?: Overrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };
 }

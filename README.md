@@ -203,6 +203,12 @@ Ropsten =>
 
 ## Other 
 
+#### Contracts
+There are several token examples. The first includes an ICO contract, the Interview Token and ChuckNorris Token are both derived from OpenZeppelin. The ChuckNorris Token includes a deployment script where the Token description is updated with Chuck Norris jokes fetched from an API.
+
+* [TemplateSale_v0.sol](./ico-erc-20.md)
+* [TemplateToken_v0.sol](./ico-erc-20.md)
+
 ### Prettier
 
 ```sh
@@ -271,3 +277,4 @@ Block of code:
 <div style='text-align: center'>
 <img src='https://raw.githubusercontent.com/ethereum/solidity/develop/docs/logo.svg' width='100px'>
 </div>
+
