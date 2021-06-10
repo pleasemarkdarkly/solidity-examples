@@ -50,9 +50,13 @@ contract Sale {
     }
 
     function setup(address tokenAddress, uint _endBlock) public{
-        require(!configSet, "Configuration already set");
+        require(!configSet, "Configuration already set");        
         Token = IERC20(tokenAddress);
-        endBlock = _endBlock;
+        require(_endBlock <= block.number, "Ending block can not be in the past");        
+        uint constant FIVE_YEARS = 10512000;
+        uint duration = _endBlock - block.number;
+        require(FIVE_YEARS >= duration, "Sale duration can not be longer than 10512000 blocks");
+        endBlock = _endBlock;        
         configSet = true;
     }
 

@@ -7,10 +7,11 @@ import "solidity-coverage";
 import { extendEnvironment, task } from 'hardhat/config';
 import { lazyObject } from "hardhat/plugins";
 import { config as dotenvConfig } from 'dotenv';
-import path from 'path';
-import fs from 'fs';
 import { resolve } from 'path';
 import "./type-extensions";
+
+import path from 'path';
+import fs from 'fs';
 
 dotenvConfig({ path: resolve(__dirname, './.env') });
 
@@ -29,10 +30,12 @@ const chainIds = {
 };
 
 const VERBOSE = false;
+
 const mnemonic = process.env.MNEMONIC || '';
 if (!mnemonic) {
   throw new Error("Please set your MNEMONIC in a .env file");
 }
+
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || '';
 const INFURA_API_KEY = process.env.INFURA_API_KEY || '';
 const ALCHEMY_API_URL = process.env.ALCHEMY_API_URL || '';
@@ -43,7 +46,7 @@ export class HardhatRuntimeEnvironmentField {
   public doSomething() {
     console.log(`Example of some object loading.`)
   }
-}
+};
 
 extendEnvironment((hre) => {
   hre.example = lazyObject(() => new HardhatRuntimeEnvironmentField())
@@ -52,8 +55,8 @@ extendEnvironment((hre) => {
 task("example", 'Example of extending hardhat configuration', async (args, hre) => {
   const a = hre.example;
   a.doSomething();
-  if (a) console.log(`Hardhat configuration loaded new task.`);
-})
+  if (a) console.log(`Example task extending Hardhat configuration, successfully loaded this task.`);
+});
 
 const traverseKeys = (obj: any, results = []) => {
   const r: any = results;
@@ -69,50 +72,58 @@ const traverseKeys = (obj: any, results = []) => {
   return r;
 };
 
-task('accounts', 'Prints the list of accounts', async (args, hre) => {
+task('accounts', 'Prints the list of available ETH accounts:', async (args, hre) => {
   const accounts = await hre.ethers.getSigners();
   for (const account of accounts) {
     console.log(await account.address);
   }
 });
 
-task('networks', 'Prints network settings', async (args, hre) => {
-  console.log(`Network settings => `);
+const HRE_DETAIL = false;
+const PRINT_ALL_NETWORKS = true;
 
-  console.log(`Hardhat Runtime Environment => `)
-  console.log(Object.keys(hre));
+task('networks', 'Prints the configured ETH network settings:', async (args, hre) => {        
+  if (HRE_DETAIL) {
+    console.log(`Hardhat Runtime Environment (properties):`)
+    console.log(Object.keys(hre));
+    // console.log(traverseKeys(hre));
+  }
 
-  VERBOSE && console.log(`Full HRE => `)
-  VERBOSE && console.log(traverseKeys(hre));
-
-  VERBOSE && console.log(Object.keys(hre['config']['networks']['alchemy']));
-
-  console.log(`Alchemy => `)
-  console.log(hre['config']['networks']['alchemy']);
-
-  console.log(`Ropsten => `)
-  console.log(hre['config']['networks']['ropsten']);
+  if (PRINT_ALL_NETWORKS) {
+    console.log(`Available Networks:`);
+    console.log(hre['config']['networks']);
+  } else {  
+    console.log(`Detail Alchemy:`);
+    console.log(hre['config']['networks']['alchemy']);
+    console.log(`Detail Ropsten:`);
+    console.log(hre['config']['networks']['ropsten']);
+  }
 })
 
 const createTestnetConfig = (
   network: keyof typeof chainIds,
 ): NetworkUserConfig => {
-  const url: string = (network !== 'alchemy')
-    ? 'https://' + network + '.infura.io/v3/' + INFURA_API_KEY
-    : ALCHEMY_API_URL;
+  const url: string = 'https://' + network + '.infura.io/v3/' + INFURA_API_KEY;
   return {
-    /*
-    accounts: {
-      count: 10,
-      initialIndex: 0,      
-      mnemonic,
-      path: "m/44'/60'/0'/0",
-    },
-    chainId: chainIds[network],
-    */
-    url,
-    accounts: [`0x${ETH_PRIVATE_KEY}`]
-  };
+      accounts: {
+        count: 10,
+        initialIndex: 0,
+        mnemonic,
+        path: "m/44'/60'/0'/0",
+      },
+      chainId: chainIds[network],
+      url,
+    };    
+};
+
+const createAlchemyConfig = (
+  network: keyof typeof chainIds,
+): NetworkUserConfig => {
+  const url: string = ALCHEMY_API_URL;  
+    return  {      
+      url,
+      accounts: [`0x${ETH_PRIVATE_KEY}`]
+    };    
 };
 
 /* You need to export an object to set up your config
@@ -137,7 +148,7 @@ const config: HardhatUserConfig = {
     kovan: createTestnetConfig('kovan'),
     rinkeby: createTestnetConfig('rinkeby'),
     ropsten: createTestnetConfig('ropsten'),
-    alchemy: createTestnetConfig('alchemy'),
+    alchemy: createAlchemyConfig('alchemy'),
   },
   solidity: {
     compilers: [

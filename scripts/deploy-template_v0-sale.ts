@@ -5,17 +5,21 @@ Runtime Environment's members available in the global scope. */
 
 import { ethers } from 'hardhat';
 import { Contract, ContractFactory } from 'ethers';
+import { config as dotenvConfig } from 'dotenv';
+import { resolve } from 'path';
+dotenvConfig({ path: resolve(__dirname, '../.env') });
+
+const ETH_PUBLIC_KEY = process.env.ETH_PUBLIC_KEY || '';
 
 async function main(): Promise<void> {
     /* Hardhat always runs the compile task when running scripts through it.
     If this runs in a standalone fashion you may want to call compile manually
     to make sure everything is compiled
     await run("compile"); We get the contract to deploy */
-    const TemplateSaleFactory: ContractFactory = await ethers.getContractFactory('TemplateSale_v0');
-    const templateSale: Contract = await TemplateSaleFactory.deploy("0x6FEFc3F6239F2A1aF8Fe093877BA2a1e81da4231");
-    await templateSale.deployed();
-    console.log('Token Sale deployed to: ', templateSale.address);
-    // Deployed at 0x7824773BFFA00f2b20b2db3B5fCC22C3713542E9
+    const SaleFactory: ContractFactory = await ethers.getContractFactory('Sale');
+    const sale: Contract = await SaleFactory.deploy(ETH_PUBLIC_KEY);
+    await sale.deployed();
+    console.log('Token Sale deployed to: ', sale.address);    
 }
 
 /* We recommend this pattern to be able to use async/await everywhere

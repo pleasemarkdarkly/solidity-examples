@@ -11,7 +11,7 @@ Includes:
 - [Solhint](https://github.com/protofire/solhint): linter
 - [Prettier Plugin Solidity](https://github.com/prettier-solidity/prettier-plugin-solidity): code formatter
 
-This is a GitHub template, which means you can reuse it as many times as you want. You can do that by clicking the "Use this template" button at the top of the page.
+__This is a GitHub template, which means you can reuse it as many times as you want. You can do that by clicking the "Use this template" button at the top of the page.__
 
 ## Usage
 
@@ -265,16 +265,13 @@ Block of code:
 * [Awesome](https://github.com/bkrem/awesome-solidity/blob/master/README.md)
 * [hardhat-docgen](https://github.com/ItsNickBarry/hardhat-docgen)
 
-#### Todo
-* @nomiclabs/hardhat-solhint
-* hardhat-deploy-ethers
-* @nomiclabs/hardhat-deploy
-* @openzeppelin/hardhat-upgrades
-* hardhat-watcher
-* buidler-contract-sizer/ hardhat-contract-sizer
-
 ### Branding
 <div style='text-align: center'>
 <img src='https://raw.githubusercontent.com/ethereum/solidity/develop/docs/logo.svg' width='100px'>
 </div>
+
+### Attribution
+<a name="footnote_001">1</a>The Sale contract was updated tp ^0.8.0 from [HunterLong](https://github.com/hunterlong/ethereum-ico-contract)'s ^0.4.21 Solidity contract. 
+
+<a name="footnote_002">2</a>The project template was hacked from [PaulRBerg](https://github.com/paulrberg/solidity-template)'s template. 
 

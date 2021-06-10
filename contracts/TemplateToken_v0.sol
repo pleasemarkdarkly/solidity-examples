@@ -56,15 +56,14 @@ contract StandardToken is BasicToken {
 
 contract Token is StandardToken {
     string public name = "TEMPLATE ERC20 TOKEN";
-    uint8 public decimals = 18;
     string public symbol = "TEMPLATE";
     string public version = "TEMPLATE 0.1";
-    address payable public mintableAddress;
     uint public constant TOTAL_SUPPLY = 5000000000000000000000000;
+    address payable public mintableAddress;
+    uint8 public decimals = 18;
 
     event Log(bool success, bytes data, address _from, uint amount);
-
-    // 0x7824773BFFA00f2b20b2db3B5fCC22C3713542E9
+    
     constructor(address payable saleAddress) {
         balances[msg.sender] = 0;
         totalSupply = 0;

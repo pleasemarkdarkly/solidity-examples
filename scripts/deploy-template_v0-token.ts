@@ -6,15 +6,17 @@ Runtime Environment's members available in the global scope. */
 import { ethers } from 'hardhat';
 import { Contract, ContractFactory } from 'ethers';
 
+const SALE_CONTRACT = "0xb92B3B34b5f5269407B7A24e1Cb98c553eFC41B4"
+
 async function main(): Promise<void> {
   /* Hardhat always runs the compile task when running scripts through it.
   If this runs in a standalone fashion you may want to call compile manually
   to make sure everything is compiled
   await run("compile"); We get the contract to deploy */
-  const ChuckNorrisTokenFactory: ContractFactory = await ethers.getContractFactory('TemplateToken_v0');
-  const chuckNorrisToken: Contract = await ChuckNorrisTokenFactory.deploy();
-  await chuckNorrisToken.deployed();
-  console.log('Open Zeppelin Chuck Norris Template Token deployed to: ', chuckNorrisToken.address);
+  const SaleTokenFactory: ContractFactory = await ethers.getContractFactory('Token');
+  const saleToken: Contract = await SaleTokenFactory.deploy(SALE_CONTRACT);
+  await saleToken.deployed();
+  console.log('Sale Token deployed to: ', saleToken.address);
 }
 
 /* We recommend this pattern to be able to use async/await everywhere
