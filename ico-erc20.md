@@ -83,6 +83,6 @@ function releaseHeldCoins()
 
 <a name="footnote_002">2</a>The project template was hacked from [PaulRBerg](https://github.com/paulrberg/solidity-template)'s template. 
 
-<a name="footnote_003">3</a>Super awesome and helpful patterns from [PaulRBerg](https://github.com/paulrberg/contracts)'s repo and [T4sk's Solidity by Example Hack section](https://github.com/solidity-by-example/solidity-by-example.github.io). 
+<a name="footnote_003">3</a>Super awesome and helpful patterns from [PaulRBerg](https://github.com/paulrberg/contracts)'s repo and [Task's Solidity by Example Hack section](https://github.com/solidity-by-example/solidity-by-example.github.io). 
 
 
