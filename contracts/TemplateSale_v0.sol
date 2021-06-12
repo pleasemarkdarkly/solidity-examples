@@ -63,7 +63,7 @@ contract Sale {
     function setup(address tokenAddress, uint _endBlock) public{
         require(!configSet, "Configuration already set");        
         Token = IERC20(tokenAddress);
-        console.log("Sales setup connecting with token:%s, starting block %s to %s", 
+        console.log("Setup initialized with token:%s, starting block %s to %s", 
             tokenAddress, block.number, _endBlock);        
         endBlock = _endBlock;        
         configSet = true;
@@ -73,36 +73,35 @@ contract Sale {
       require(msg.sender==creator, "Unauthorized");
       isFunding = false;
     }
-
+    
     // solhint-disable-next-line
     fallback() external payable {
-        require(msg.value>0, "Insufficent transaction");
-        require(isFunding, "Funding concluded");
+        require(msg.value>0, "Insufficent funds");
+        require(isFunding, "Token Sale concluded");
         // require(block.number <= endBlock, "Funding concluded");
         uint256 amount = msg.value * exchangeRate;
         uint256 total = totalMinted + amount;
-        require(total<=maxMintable, "Supply depleted");
+        require(total<=maxMintable, "Token Supply depleted");
         totalMinted += total;
         ETHWallet.transfer(msg.value);
         Token.mintToken(msg.sender, amount);
         emit Contribution(msg.sender, amount);
-    }
-
-    receive() external payable {        
-        emit Contribution(msg.sender, msg.value);
     }
 
     function contribute() external payable {
         require(msg.value>0, "Insufficient funds");
         require(isFunding, "Token Sale concluded");
-        require(block.number <= endBlock, "Token Sale concluded");
+        // require(block.number <= endBlock, "Token Sale concluded");
         uint256 amount = msg.value * exchangeRate;
         uint256 total = totalMinted + amount;
-        require(total<=maxMintable, "Token Sale fully funded");
+        require(total<=maxMintable, "Token Supply depleted");
         totalMinted += total;
         ETHWallet.transfer(msg.value);
         Token.mintToken(msg.sender, amount);
         emit Contribution(msg.sender, amount);
+    }
+
+    receive() external payable {                
     }
 
     function updateRate(uint256 rate) external {
@@ -142,8 +141,8 @@ contract Sale {
         uint256 held = heldTokens[msg.sender];
         uint heldBlock = heldTimeline[msg.sender];
         // solhint-disable-next-line
-        require(!isFunding, "Tokens withheld until Sale is complete");
-        require(held >= 0, "Initialization error");
+        require(!isFunding, "Funding is still active");
+        require(held >= 0, "No held tokens");
         // solhint-disable-next-line
         require(block.number >= heldBlock, "Token hold period has not expired");
         heldTokens[msg.sender] = 0;
