@@ -23,6 +23,7 @@ if (VERBOSE && ALCHEMY_API_URL && ETH_PUBLIC_KEY) {
 };
 
 const web3 = createAlchemyWeb3(ALCHEMY_API_URL);
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const local_contract = require(resolve(__dirname, `../artifacts/contracts/TemplateToken_v2.sol/ChuckNorrisToken.json`));
 if (local_contract) {
     console.log(`Loaded:${local_contract.contractName} (${local_contract.sourceName})`);
@@ -63,12 +64,15 @@ const updateDescription = async (contract: any, newDescription: string) => {
         console.log(tx);
         console.log(`[${timestamp}] Signing the transaction => `);    
         const signPromise = web3.eth.accounts.signTransaction(tx, ETH_PRIVATE_KEY);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         signPromise.then((signedTx: any) => {
             console.log(`[${timestamp}] Signed Transaction:`);
             console.log(Object.keys(signedTx));
             console.log(signedTx);
-            web3.eth.sendSignedTransaction(signedTx.rawTransaction, (e, hash) => {
-                if (!e) console.log(`[${timestamp}] Tx Hash => ${hash}. Verify transaction on Alchemy (https://dashboard.alchemyapi.io/explorer?time_min=1622580302973&time_range_preset=last5Minutes).`)
+            void web3.eth.sendSignedTransaction(signedTx.rawTransaction, (e, hash) => {
+                if (!e) console.log(`[${timestamp}] Tx Hash => ${hash}. ` +
+                    `Verify transaction on Alchemy ` +
+                    `(https://dashboard.alchemyapi.io/explorer?time_min=1622580302973&time_range_preset=last5Minutes).`)
                 else console.error(`[${timestamp}] Something went wrong with transmissing the transaction:`, e);
             })
         }).catch((e) => {

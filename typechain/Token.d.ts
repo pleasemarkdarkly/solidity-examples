@@ -21,14 +21,15 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface TokenInterface extends ethers.utils.Interface {
   functions: {
-    "TOTAL_SUPPLY()": FunctionFragment;
     "allowTransfer()": FunctionFragment;
     "allowance(address,address)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "approveAndCall(address,uint256)": FunctionFragment;
+    "authorizedSupply()": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "changeTransfer(bool)": FunctionFragment;
     "decimals()": FunctionFragment;
+    "generator()": FunctionFragment;
     "mintToken(address,uint256)": FunctionFragment;
     "mintableAddress()": FunctionFragment;
     "name()": FunctionFragment;
@@ -39,10 +40,6 @@ interface TokenInterface extends ethers.utils.Interface {
     "version()": FunctionFragment;
   };
 
-  encodeFunctionData(
-    functionFragment: "TOTAL_SUPPLY",
-    values?: undefined
-  ): string;
   encodeFunctionData(
     functionFragment: "allowTransfer",
     values?: undefined
@@ -59,12 +56,17 @@ interface TokenInterface extends ethers.utils.Interface {
     functionFragment: "approveAndCall",
     values: [string, BigNumberish]
   ): string;
+  encodeFunctionData(
+    functionFragment: "authorizedSupply",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "balanceOf", values: [string]): string;
   encodeFunctionData(
     functionFragment: "changeTransfer",
     values: [boolean]
   ): string;
   encodeFunctionData(functionFragment: "decimals", values?: undefined): string;
+  encodeFunctionData(functionFragment: "generator", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "mintToken",
     values: [string, BigNumberish]
@@ -90,10 +92,6 @@ interface TokenInterface extends ethers.utils.Interface {
   encodeFunctionData(functionFragment: "version", values?: undefined): string;
 
   decodeFunctionResult(
-    functionFragment: "TOTAL_SUPPLY",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "allowTransfer",
     data: BytesLike
   ): Result;
@@ -103,12 +101,17 @@ interface TokenInterface extends ethers.utils.Interface {
     functionFragment: "approveAndCall",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "authorizedSupply",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "changeTransfer",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "decimals", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "generator", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "mintToken", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "mintableAddress",
@@ -182,8 +185,6 @@ export class Token extends BaseContract {
   interface: TokenInterface;
 
   functions: {
-    TOTAL_SUPPLY(overrides?: CallOverrides): Promise<[BigNumber]>;
-
     allowTransfer(overrides?: CallOverrides): Promise<[boolean]>;
 
     allowance(
@@ -204,6 +205,8 @@ export class Token extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    authorizedSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     balanceOf(
       _owner: string,
       overrides?: CallOverrides
@@ -215,6 +218,8 @@ export class Token extends BaseContract {
     ): Promise<ContractTransaction>;
 
     decimals(overrides?: CallOverrides): Promise<[number]>;
+
+    generator(overrides?: CallOverrides): Promise<[string]>;
 
     mintToken(
       to: string,
@@ -246,8 +251,6 @@ export class Token extends BaseContract {
     version(overrides?: CallOverrides): Promise<[string]>;
   };
 
-  TOTAL_SUPPLY(overrides?: CallOverrides): Promise<BigNumber>;
-
   allowTransfer(overrides?: CallOverrides): Promise<boolean>;
 
   allowance(
@@ -268,6 +271,8 @@ export class Token extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  authorizedSupply(overrides?: CallOverrides): Promise<BigNumber>;
+
   balanceOf(_owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   changeTransfer(
@@ -276,6 +281,8 @@ export class Token extends BaseContract {
   ): Promise<ContractTransaction>;
 
   decimals(overrides?: CallOverrides): Promise<number>;
+
+  generator(overrides?: CallOverrides): Promise<string>;
 
   mintToken(
     to: string,
@@ -307,8 +314,6 @@ export class Token extends BaseContract {
   version(overrides?: CallOverrides): Promise<string>;
 
   callStatic: {
-    TOTAL_SUPPLY(overrides?: CallOverrides): Promise<BigNumber>;
-
     allowTransfer(overrides?: CallOverrides): Promise<boolean>;
 
     allowance(
@@ -329,11 +334,15 @@ export class Token extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
+    authorizedSupply(overrides?: CallOverrides): Promise<BigNumber>;
+
     balanceOf(_owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     changeTransfer(allowed: boolean, overrides?: CallOverrides): Promise<void>;
 
     decimals(overrides?: CallOverrides): Promise<number>;
+
+    generator(overrides?: CallOverrides): Promise<string>;
 
     mintToken(
       to: string,
@@ -396,8 +405,6 @@ export class Token extends BaseContract {
   };
 
   estimateGas: {
-    TOTAL_SUPPLY(overrides?: CallOverrides): Promise<BigNumber>;
-
     allowTransfer(overrides?: CallOverrides): Promise<BigNumber>;
 
     allowance(
@@ -418,6 +425,8 @@ export class Token extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    authorizedSupply(overrides?: CallOverrides): Promise<BigNumber>;
+
     balanceOf(_owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     changeTransfer(
@@ -426,6 +435,8 @@ export class Token extends BaseContract {
     ): Promise<BigNumber>;
 
     decimals(overrides?: CallOverrides): Promise<BigNumber>;
+
+    generator(overrides?: CallOverrides): Promise<BigNumber>;
 
     mintToken(
       to: string,
@@ -458,8 +469,6 @@ export class Token extends BaseContract {
   };
 
   populateTransaction: {
-    TOTAL_SUPPLY(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     allowTransfer(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     allowance(
@@ -480,6 +489,8 @@ export class Token extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    authorizedSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     balanceOf(
       _owner: string,
       overrides?: CallOverrides
@@ -491,6 +502,8 @@ export class Token extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     decimals(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    generator(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     mintToken(
       to: string,

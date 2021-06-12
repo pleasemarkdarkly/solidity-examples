@@ -58,27 +58,31 @@ contract Token is StandardToken {
     string public name = "TEMPLATE ERC20 TOKEN";
     string public symbol = "TEMPLATE";
     string public version = "TEMPLATE 0.1";
-    uint public constant TOTAL_SUPPLY = 5000000000000000000000000;
+    uint256 public authorizedSupply = 5000000000000000000000000;
     address payable public mintableAddress;
     uint8 public decimals = 18;
+    string public generator = "https://pleasemarkdarkly.github.io/";
 
     event Log(bool success, bytes data, address _from, uint amount);
     
-    constructor(address payable saleAddress) {
+    constructor(address payable saleAddress,
+    string memory _name, 
+    string memory _symbol, 
+    string memory _version) {
         balances[msg.sender] = 0;
         totalSupply = 0;
-        name = name;
+        name = _name;
+        symbol = _symbol;
+        version = _version;
         decimals = decimals;
-        symbol = symbol;
         mintableAddress = saleAddress;
         allowTransfer = true;
         createTokens();
     }
 
-    function createTokens() internal {
-        uint256 total = TOTAL_SUPPLY;
-        balances[address(this)] = total;
-        totalSupply = total;
+    function createTokens() internal {        
+        balances[address(this)] = authorizedSupply;
+        totalSupply = authorizedSupply;
     }
 
     function changeTransfer(bool allowed) external {

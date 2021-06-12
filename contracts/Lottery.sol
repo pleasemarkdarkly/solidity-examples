@@ -3,23 +3,24 @@ pragma solidity ^0.8.0;
 
 contract Lottery{
     
-    uint totalAmount;
-    uint numOfPlayers = 0;
-    mapping (uint => address) players;
-    mapping (address => bool) participated;
+    uint public totalAmount;
+    uint public numOfPlayers = 0;
+    mapping (uint => address payable) public players;
+    mapping (address => bool) public participated;
     enum State {Accepting, Distributing, Paid}
-    State state;
+    State internal state;
     
     constructor(){
         state = State.Accepting;
     }
 
+    receive () external payable { }
     fallback() external payable { }
 
     function wager() public payable joinable{
         if(msg.value > 0){
-            if(participated[msg.sender] == false){
-                players[numOfPlayers] = msg.sender;
+            if(participated[msg.sender] == false){                
+                players[numOfPlayers] = payable(msg.sender);
                 participated[msg.sender] = true;
                 numOfPlayers++;
                 if (numOfPlayers == 5){
@@ -34,21 +35,20 @@ contract Lottery{
     }
     
     modifier joinable(){
-        require (state == State.Accepting);
+        require (state == State.Accepting, "Accepting");
         _;
     }
     modifier isFinished(){
-        require (state == State.Distributing);
+        require (state == State.Distributing, "Distributing");
         _;
     }
     modifier restatable(){
-        require (state == State.Paid);
+        require (state == State.Paid, "Paid");
         _;
     }
     function selectWinner() private isFinished{
-        uint winner = random()%5;
-        // TODO:
-        // players[winner].transfer(totalAmount);
+        uint winner = random()%5;                
+        payable(players[winner]).transfer(totalAmount);        
         state = State.Paid;
         restart();
     }
@@ -62,9 +62,7 @@ contract Lottery{
         state = State.Accepting;
     }
     
-    function random () private view returns (uint) {
-        // TODO: Update randomness
-        // return uint(keccak256(block.difficulty, block.timestamp, 5));
-        return 1;
+    function random () private view returns (uint) {        
+        return uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp)));        
     }
 }

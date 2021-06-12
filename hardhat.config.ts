@@ -10,9 +10,6 @@ import { config as dotenvConfig } from 'dotenv';
 import { resolve } from 'path';
 import "./type-extensions";
 
-import path from 'path';
-import fs from 'fs';
-
 dotenvConfig({ path: resolve(__dirname, './.env') });
 
 import { HardhatUserConfig } from 'hardhat/types';
@@ -29,7 +26,7 @@ const chainIds = {
   alchemy: 0,
 };
 
-const VERBOSE = false;
+export const VERBOSE = false;
 
 const mnemonic = process.env.MNEMONIC || '';
 if (!mnemonic) {
@@ -42,7 +39,8 @@ const ALCHEMY_API_URL = process.env.ALCHEMY_API_URL || '';
 const ETH_PRIVATE_KEY = process.env.ETH_PRIVATE_KEY || '';
 
 export class HardhatRuntimeEnvironmentField {
-  constructor() { }
+  constructor() { null }
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   public doSomething() {
     console.log(`Example of some object loading.`)
   }
@@ -117,6 +115,7 @@ const createTestnetConfig = (
 };
 
 const createAlchemyConfig = (
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   network: keyof typeof chainIds,
 ): NetworkUserConfig => {
   const url: string = ALCHEMY_API_URL;  

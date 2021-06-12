@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "hardhat/console.sol";
+
 abstract contract IERC20 {
   uint public totalSupply;
   function balanceOf(address who) public virtual returns (uint);
@@ -27,6 +29,11 @@ contract Sale {
 
     bool private configSet;
     address public creator;
+    // solhint-disable-next-line
+    address FOUNDER_GROUP_ONE = 0x6FEFc3F6239F2A1aF8Fe093877BA2a1e81da4231; 
+    // solhint-disable-next-line
+    address FOUNDER_GROUP_TWO = 0xB772C38aCa8fac0FB50Fd01899ef3Dfa8B7DF628; 
+    // string public generator = "https://pleasemarkdarkly.github.io/";
 
     mapping (address => uint256) public heldTokens;
     mapping (address => uint) public heldTimeline;
@@ -44,18 +51,20 @@ contract Sale {
         maxMintable = TOTAL_SUPPLY; 
         ETHWallet = _wallet;
         isFunding = true;
-        creator = msg.sender;
+        creator = msg.sender;        
         createHeldCoins();
         exchangeRate = 600;
+        
+        console.log("Token Sale Contract created. Starting block:%s", startBlock);
+        console.log("Token max supply:%s, %s/per ETH", TOTAL_SUPPLY, exchangeRate);
+        console.log("Token proceeds payable to:%s", _wallet);
     }
 
     function setup(address tokenAddress, uint _endBlock) public{
         require(!configSet, "Configuration already set");        
         Token = IERC20(tokenAddress);
-        require(_endBlock <= block.number, "Ending block can not be in the past");        
-        uint FIVE_YEARS = 10512000;
-        uint duration = _endBlock - block.number;
-        require(FIVE_YEARS >= duration, "Sale duration can not be longer than 10512000 blocks");
+        console.log("Sales setup connecting with token:%s, starting block %s to %s", 
+            tokenAddress, block.number, _endBlock);        
         endBlock = _endBlock;        
         configSet = true;
     }
@@ -69,7 +78,7 @@ contract Sale {
     fallback() external payable {
         require(msg.value>0, "Insufficent transaction");
         require(isFunding, "Funding concluded");
-        require(block.number <= endBlock, "Funding concluded");
+        // require(block.number <= endBlock, "Funding concluded");
         uint256 amount = msg.value * exchangeRate;
         uint256 total = totalMinted + amount;
         require(total<=maxMintable, "Supply depleted");
@@ -112,12 +121,8 @@ contract Sale {
         Token.changeTransfer(_allowed);
     }
 
-    function createHeldCoins() internal {
-        // solhint-disable-next-line
-        address FOUNDER_GROUP_ONE = 0x6FEFc3F6239F2A1aF8Fe093877BA2a1e81da4231; 
-        // solhint-disable-next-line
-        address FOUNDER_GROUP_TWO = 0xB772C38aCa8fac0FB50Fd01899ef3Dfa8B7DF628; 
-        createHoldToken(msg.sender, 1000);
+    function createHeldCoins() internal {        
+        createHoldToken(msg.sender, 100000000000000000000000);
         createHoldToken(FOUNDER_GROUP_TWO, 100000000000000000000000);
         createHoldToken(FOUNDER_GROUP_ONE, 100000000000000000000000);
     }

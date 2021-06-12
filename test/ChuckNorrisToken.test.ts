@@ -1,7 +1,6 @@
 import chai from "chai";
 import { ethers } from "hardhat";
 import { solidity } from "ethereum-waffle";
-import { ChuckNorrisToken } from "../typechain/ChuckNorrisToken";
 import { ChuckNorrisToken__factory } from "../typechain";
 
 chai.use(solidity);
@@ -11,7 +10,7 @@ describe("Open Zeppelin Chuck Norris Token Example", () => {
     let tokenAddress: string;
 
     beforeEach(async () => {
-        const [deployer, user] = await ethers.getSigners();
+        const [deployer] = await ethers.getSigners();
         const tokenFactory = new ChuckNorrisToken__factory(deployer);
         const tokenContract = await tokenFactory.deploy();
         tokenAddress = tokenContract.address;
