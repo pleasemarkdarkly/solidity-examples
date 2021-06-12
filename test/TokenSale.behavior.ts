@@ -27,58 +27,59 @@ export function shouldBehaveLikeSale(): void {
         ));
 
         expect(process.stdout.write(`Sale max mintable(total supply):${await this.sale.connect(this.signers.admin).maxMintable()}` + `\n` +
-            `Sales minted:${await this.sale.connect(this.signers.admin).totalMinted()}` + `\n`));
+            `Sales token total minted:${await this.sale.connect(this.signers.admin).totalMinted()}` + `\n`));
     });
     
     it("should return empty or minimal wallet balances of the Sales and Token balances before contributions", async function () {                            
-        expect(process.stdout.write(`Sale contract balance:${await this.token.balanceOf(this.sale.address)}` + `\n` +
-                `Token contract balance:${await this.token.balanceOf(this.token.address)}` + `\n` +
-                `Sale proceeds wallet balance:${await this.token.balanceOf(await this.sale.connect(this.signers.admin).ETHWallet())}` + `\n`                        
+        expect(process.stdout.write(`Sale Eth wallet balance:${await this.sale.connect(this.signers.admin).ETHWallet()}` + `\n` +
+                `Token contract balance/address:${await this.token.address}` + `\n` +
+                `Sale proceeds wallet balance:${await this.sale.address}` + `\n`                        
         ));               
     });
-    
-    let contribution = `.${Math.floor(Math.random() * 99999999999999999999)}`;
-
+        
     it("should return twenty wallets with ether to simulate funding campaign", async function () {
-        const accounts = await hre.ethers.getSigners();        
+        const signers: SignerWithAddress[] = await hre.ethers.getSigners();
+        const contribution = `.${Math.floor(Math.random() * 99999999999999999999)}`;
         expect(process.stdout.write(`Simulation wallets will contribution random amounts:` +
             `${hre.ethers.utils.parseEther(contribution)}` + `\n`));
-        accounts.map(async a => {
-            process.stdout.write(`${a.address}: ${await a.getBalance()}` + `\n`);
+        signers.map(async a => {
+            process.stdout.write(`${await a.address}:${await a.getBalance()}` + `\n`);
         });
+        process.stdout.write(`\n`);
     });
-
-    it("should generate random amounts of eth to transfer to Sale Contract", async function () {                
-        await (await hre.ethers.getSigners()).forEach(async a => {            
-            contribution = `.${Math.floor(Math.random() * 99999999999999999999)}`;
+        
+    it("should generate random amounts of eth to transfer to Sale Contract", async function () {                                
+        const signers: SignerWithAddress[] = await hre.ethers.getSigners();
+        signers.map(async a => {
+            const contribution = `.${Math.floor(Math.random() * 99999999999999999999)}`;
+            process.stdout.write(`${await a.address}=> ${hre.ethers.utils.parseEther(contribution)} (wei)` + `\n`);
             await a.sendTransaction({
-                to: this.sale.address,
+                to: await this.sale.address,
                 value: hre.ethers.utils.parseEther(contribution)
             });
-        });                               
+        });
+        // process.stdout.write(`\n`);
     });
 
     it("should return wallets with fewer wei/ethers from transfering", async function () {
         const signers: SignerWithAddress[] = await hre.ethers.getSigners();
-        signers.map(async a => {
-            const addr = a.address;
-            const eth = await a.getBalance();
-            if (a.address.toString !== this.proceedsWallet.address.toString()) {
-                process.stdout.write(`${addr}:${eth} (ETH)` + `\n`);
-            }
+        signers.map(async a => {            
+            const eth = await a.getBalance();            
+            process.stdout.write(`${await a.address}:${eth} (eth)` + `\n`);            
         });
     });
 
+    /*
     it("should return all wallets with token balances", async function () {        
-        const accounts = await hre.ethers.getSigners();
         process.stdout.write(`\n`);
+        const signers: SignerWithAddress[] = await hre.ethers.getSigners();
         const totalTokens = await this.sale.connect(this.signers.admin).totalMinted();
         process.stdout.write(`Total Tokens minted via Sale contract:${totalTokens}` + `\n` + 
-            `Total ETH value of the payable wallet:${await this.proceedsWallet.getBalance()}` + `\n`
+            `Total ETH value of the payable wallet:${await this.proceedsPool.getBalance()}` + `\n`
         );        
-        accounts.map(async a => {
-            if (a.address.toString() !== this.proceedsWallet.address.toString()) {
-                const add = a.address;
+        signers.map(async a => {
+            if (await a.address.toString() !== await this.proceedsWallet.address.toString()) {
+                const add = await a.address;
                 const tok = await this.token.connect(this.signers.admin).balanceOf(add);
                 const sym = await this.token.connect(this.signers.admin).symbol();
                 const eth = await a.getBalance();
@@ -88,4 +89,5 @@ export function shouldBehaveLikeSale(): void {
             }
         });
     })
+    */
 }

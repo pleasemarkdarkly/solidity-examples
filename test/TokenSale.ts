@@ -18,27 +18,27 @@ describe("Unit test for the sale, token contracts", function () {
         this.signers = {} as Signers;
         const signers: SignerWithAddress[] = await hre.ethers.getSigners();
         this.signers.admin = signers[0];
-        this.proceedsWallet = signers[19];
+        this.proceedsPool = signers[1];
         
-        let count = 1;
+        let count = 2;
         signers.forEach(s => {
-            if (count != 1) {
+            if (count > 2) {
                 expect(process.stdout.write(`(${count}) ${s.address}` + `\n`));
                 count++;
             } 
         })        
         expect(process.stdout.write(`\n` + `Contract owner:${this.signers.admin.address}` + `\n`));
-        expect(process.stdout.write(`Proceeds wallet:${this.proceedsWallet.address}` + `\n` + `\n`));
+        expect(process.stdout.write(`Proceeds wallet:${this.proceedsPool.address}` + `\n` + `\n`));
         process.stdout.write(`\n`);
     });
 
     describe("Sale initialization", function () {
         before(async function () {
             const saleArtifact: Artifact = await hre.artifacts.readArtifact("Sale");
-            this.sale = <Sale>await deployContract(this.signers.admin, saleArtifact, [this.proceedsWallet.address]);
+            this.sale = <Sale>await deployContract(this.signers.admin, saleArtifact, [this.proceedsPool.address]);
             // eslint-disable-next-line @typescript-eslint/no-empty-function
-            expect(process.stdout.write(`Sale contract deployed at:${this.sale.address}` + `\n`));
-            expect(process.stdout.write(`Sales proceeds configured for:${this.proceedsWallet.address}` + `\n`));           
+            expect(process.stdout.write(`Sale contract first deployed at:${this.sale.address}` + `\n`));
+            expect(process.stdout.write(`Sale wallet proceeds set to:${this.proceedsPool.address}` + `\n`));
         });
 
         it("Token initialization", async function () {
@@ -57,7 +57,7 @@ describe("Unit test for the sale, token contracts", function () {
             void this.sale.connect(this.signers.admin).setup(this.token.address, endingBlock);
         });
 
-        it("Sale and Token contracts deployed and funding", async function () {
+        it("Sale and Token contracts deployed and funding has started", async function () {
             expect(this.sale.connect(this.signers.admin).isFunding);
         });
 
