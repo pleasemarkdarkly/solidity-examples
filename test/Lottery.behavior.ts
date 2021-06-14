@@ -8,12 +8,13 @@ export const getRandomInt = (max: number):number => {
 export function shouldBehaveLikeLottery(): void {    
     it("should return generator url from lottery", async function () {
 
-        this.lottery.connect(this.signers.admin).on("Log", (lottery: SignerWithAddress, gambler: SignerWithAddress, wager: number, msg: string) => {
+        this.lottery.connect(this.signers.admin).on("Log",
+            (lottery: SignerWithAddress, gambler: SignerWithAddress, wager: number, msg: string) => {
             console.log(`${lottery} ${gambler}:${wager}-${msg}`);
         });
 
         expect(process.stdout.write(`deployed lottery contract to => ` +
-            `${await this.lottery.address} / ${await this.lottery.connect(this.signers.admin).address}` + `\n`));
+            `${await this.lottery.address}` + `\n`));
         expect(process.stdout.write(`generator:` +
             `${await this.lottery.connect(this.signers.admin).generator()}` + `\n`));
     });
@@ -29,38 +30,40 @@ export function shouldBehaveLikeLottery(): void {
         });        
     });
 
-    it("should compute wager amount", async function () {        
+    it("should compute wager amount", async function () {                
         await this.gamblers.forEach(async (g: SignerWithAddress) => {
             const wagerAmount = getRandomInt(10000000);
             process.stdout.write(`${await g.address}:${await g.getBalance()}:${wagerAmount} (wei)` + `\n`);                        
         });
-    });
-
-    it("should wager", async function () {        
         process.stdout.write(`deployed lottery contract to => ${await this.lottery.address} balance:` +
             `${await this.lottery.connect(this.signers.admin).totalAmount()}` + `\n`);
-        
+        process.stdout.write(`\n`);
+    });
+
+    it("should show gamblers wagers", async function () {                
         await this.gamblers.forEach(async (g: SignerWithAddress) => {
-            const wagerAmount = getRandomInt(10000000);            
-            await g.sendTransaction({
-                to: await this.lottery.connect(this.signers.admin).address,
-                value: wagerAmount
-            });
+            const wagerAmount = getRandomInt(10000000);
+            const lotteryContract = await this.lottery.connect(this.signers.admin).address;            
+            await g.sendTransaction({ to: lotteryContract, value: wagerAmount })
             const txReciept = await this.lottery.connect(g).wager();
             await txReciept.wait();
             process.stdout.write(`${await g.address}:${await g.getBalance()}` + `\n` + 
                 `\t` + `${txReciept.hash}(${txReciept.blockNumber}):(${txReciept.gasPrice})(${txReciept.from})` + `\n`);
         });        
-        process.stdout.write(`deployed lottery contact to => ${await this.lottery.address} balance:` +
+        process.stdout.write(`\n`);
+        process.stdout.write(`deployed lottery contract to => ${await this.lottery.address} balance:` +
             `${await this.lottery.connect(this.signers.admin).totalAmount()}` + `\n`);
     });
 
+    /*
     it("check lottery contract properties", async function () {                                        
-        const lotteryProps = Object.keys(await this.lottery.connect(this.signers.admin)).toString().split(',');
+        const lotteryProps = Object.keys(
+            await this.lottery.connect(this.signers.admin)).toString().split(',');
         lotteryProps.forEach(p => {
             process.stdout.write(`${p}` + `\n`);
         });
     });
+    */
 
     it("should select winner", async function () {
         this.gamblers.forEach(async (g: SignerWithAddress) => {           
@@ -69,23 +72,16 @@ export function shouldBehaveLikeLottery(): void {
     });
 
     it("should return hardhat helpers", async function () {
+        process.stdout.write(`\n`);
         process.stdout.write(`deployed lottery contract to => ${await this.lottery.connect(this.signers.admin).address}` +
             `(${await this.lottery.connect(this.signers.admin).numOfPlayers()}):` +
-            `${await this.lottery.connect(this.signers.admin).totalAmount()}` + `\n`);
+            `${await this.lottery.connect(this.signers.admin).totalAmount()}` +            
+            `\n`);
         
-        process.stdout.write(
-            `${await this.lottery.connect(this.signers.admin).address}, ` +
-            `${await this.lottery.connect(this.signers.admin).address.getBalance}, ` +
-            `${await this.lottery.connect(this.signers.admin).totalAmount()}, ` +                        
-            `${await this.lottery.address}, ` + `\n`
-        );
-
+        process.stdout.write(`\n`);        
         const lotteryProps = Object.keys(await this.lottery).toString().split(',');
         lotteryProps.forEach(p => {
             process.stdout.write(`${p}` + `\n`);
         })
     });
-
-
-
 };

@@ -22,7 +22,7 @@ describe("Lottery Contract Interaction Example", function () {
     });
 
     describe("Creating Lottery Contract", function () {
-        beforeEach(async function () {            
+        before(async function () {            
             const lotteryArtifact: Artifact = await hre.artifacts.readArtifact("Lottery");
             this.lottery = <Lottery>await deployContract(this.signers.admin, lotteryArtifact, []);
         });
