@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "hardhat/console.sol";
+
 abstract contract BasicToken {
     uint256 public totalSupply;
     bool public allowTransfer;
@@ -78,6 +80,7 @@ contract Token is StandardToken {
         mintableAddress = saleAddress;
         allowTransfer = true;
         createTokens();
+        console.log("%s Token created, payable to %s", _name, saleAddress);
     }
 
     function createTokens() internal {        
@@ -97,6 +100,7 @@ contract Token is StandardToken {
         balances[to] += amount;
         emit Transfer(address(this), to, amount);
         success = true;
+        console.log("$s token minted to %s", amount, to);
     }
 
     function approveAndCall(address payable _spender, uint256 _value) public returns (bool _success) {

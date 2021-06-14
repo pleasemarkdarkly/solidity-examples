@@ -48,19 +48,23 @@ export function shouldBehaveLikeSale(): void {
         process.stdout.write(`\n`);
     });
         
+    
     it("should generate random amounts of eth to transfer to Sale Contract", async function () {                                
         const signers: SignerWithAddress[] = await hre.ethers.getSigners();
         signers.map(async a => {
-            const contribution = `.${Math.floor(Math.random() * 99999999999999999999)}`;
-            process.stdout.write(`${await a.address}=> ${hre.ethers.utils.parseEther(contribution)} (wei)` + `\n`);
+            const contribution = `.${Math.floor(Math.random() * 1000000000000)}`;
+            process.stdout.write(`${await a.address} => ${hre.ethers.utils.parseEther(contribution)} (wei)` + `\n`);                                    
+    /*
             await a.sendTransaction({
                 to: await this.sale.address,
                 value: hre.ethers.utils.parseEther(contribution)
             });
+            await this.sale.connect(this.signers.admin).contribute();
+            */
         });
         // process.stdout.write(`\n`);
     });
-
+        
     it("should return wallets with fewer wei/ethers from transfering", async function () {
         const signers: SignerWithAddress[] = await hre.ethers.getSigners();
         signers.map(async a => {            

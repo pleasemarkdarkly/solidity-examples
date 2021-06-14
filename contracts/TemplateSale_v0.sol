@@ -66,6 +66,7 @@ contract Sale {
         console.log("Setup initialized with token:%s, starting block %s to %s", 
             tokenAddress, block.number, _endBlock);        
         endBlock = _endBlock;        
+        console.log("Sale (initialized setup) with token address:%s and ends on block:%s", tokenAddress, _endBlock);
         configSet = true;
     }
 
@@ -76,16 +77,7 @@ contract Sale {
     
     // solhint-disable-next-line
     fallback() external payable {
-        require(msg.value>0, "Insufficent funds");
-        require(isFunding, "Token Sale concluded");
-        // require(block.number <= endBlock, "Funding concluded");
-        uint256 amount = msg.value * exchangeRate;
-        uint256 total = totalMinted + amount;
-        require(total<=maxMintable, "Token Supply depleted");
-        totalMinted += total;
-        ETHWallet.transfer(msg.value);
-        Token.mintToken(msg.sender, amount);
-        emit Contribution(msg.sender, amount);
+        require(msg.value == 0, "Must call contribute explicitly");
     }
 
     function contribute() external payable {
@@ -98,6 +90,7 @@ contract Sale {
         totalMinted += total;
         ETHWallet.transfer(msg.value);
         Token.mintToken(msg.sender, amount);
+        console.log("Sale issuing %s to %s", amount, msg.sender);
         emit Contribution(msg.sender, amount);
     }
 

@@ -18,7 +18,7 @@ describe("Open Zeppelin Chuck Norris Token Example", () => {
     });
 
     describe("Mint", async () => {
-        it("Should mint some tokens", async () => {
+        it("should mint some tokens", async () => {
             const [deployer, user] = await ethers.getSigners();
             const tokenInstance = new ChuckNorrisToken__factory(deployer).attach(tokenAddress);
             const toMint = ethers.utils.parseEther("10000000000");
@@ -28,7 +28,7 @@ describe("Open Zeppelin Chuck Norris Token Example", () => {
     });
 
     describe("Transfer", async () => {
-        it("Should transfer tokens between users", async () => {
+        it("should transfer tokens between users", async () => {
             const [deployer, sender, receiver] = await ethers.getSigners();
             const deployerInstance = new ChuckNorrisToken__factory(deployer).attach(tokenAddress);
             const toMint = ethers.utils.parseEther("10000000000");
