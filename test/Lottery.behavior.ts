@@ -63,14 +63,14 @@ export function shouldBehaveLikeLottery(): void {
     });
     
     it("should display players/gamblers addresses and balances", async function () {        
-        await this.gamblers.forEach(async (g: SignerWithAddress) => {
+        this.gamblers.forEach(async (g: SignerWithAddress) => {
             process.stdout.write(`${await g.address}:${await g.getBalance()}` + `\n`);            
         });
         process.stdout.write(`\n`);
     });
     
     it("should generate random amounts to wager", async function () {                        
-        await await this.gamblers.forEach(async (g: SignerWithAddress) => {
+        this.gamblers.forEach(async (g: SignerWithAddress) => {
             const wagerAmount = getRandomBigNumber(MAX_WAGER_AMOUNT);            
             process.stdout.write(`${await g.address}:${await g.getBalance()}:${wagerAmount} (wei)` + `\n`);            
         });                    
@@ -96,7 +96,7 @@ export function shouldBehaveLikeLottery(): void {
             const [e] = w.events;
             
             // console.log(reciept, wager_reciept);
-
+            
             const { to, from, gasUsed, blockHash, transactionHash, blockNumber, cumulativeGasUsed } = reciept;                        
             process.stdout.write(`(${blockNumber}) ${to} => ${from}` + `(${totalAmount})` + `\n` +
                 `\t` + `(${transactionHash}/${blockHash}) (${gasUsed}/${cumulativeGasUsed})` + `\n`
