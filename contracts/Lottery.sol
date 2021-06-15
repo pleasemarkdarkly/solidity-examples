@@ -76,9 +76,9 @@ contract Lottery{
         state = State.Accepting;
     }
     
-    function random () private view returns (uint) {        
-        // emit Log(address(this), msg.sender, msg.value, "random");
-        // console.log("Random number:%s", keccak256(abi.encodePacked(block.difficulty, block.timestamp)));
-        return uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp)));        
+    function random () private returns (uint) {        
+        uint rnd = uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp))); 
+        emit Log(address(this), msg.sender, rnd, "random");        
+        return rnd;     
     }
 }
