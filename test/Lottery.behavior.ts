@@ -79,29 +79,33 @@ export function shouldBehaveLikeLottery(): void {
         process.stdout.write(`\n`);
     });
 
+
     it("should wager and select winner", async function () {
-        await this.gamblers.forEach(async (g: SignerWithAddress) => {
+        for (let i = 0; i < this.gamblers.length; i++) {
             const amount = getRandomBigNumber(MAX_WAGER_AMOUNT);
+            const g: SignerWithAddress = this.gamblers[i];
             const contract = await this.lottery.connect(g.address).address;
-            const estgas = await this.lottery.connect(g.address).estGasPrice;
-            const tx = await g.sendTransaction({ to: contract, value: amount, gasPrice: estgas });
-            const wager = await this.lottery.connect(g).wager();
-            const txReciept = await tx.wait();
-            await printContractTxReciept(txReciept);
-            
-            // const wagerReciept = await wager.wait();
-            // await printContractTxReciept(wagerReciept);            
-            process.stdout.write(`${await g.address}:${await g.getBalance()} (wei)` + `\n`);
-            process.stdout.write(`Lottery totalAmount:${await this.lottery.connect(g.address).totalAmount()}` + `\n`);
-            process.stdout.write(`\n`);
+            const tx = await g.sendTransaction({ to: contract, value: amount });
+            const wager = await this.lottery.connect(g).wager();            
+            const reciept = await tx.wait();
+            const wager_reciept = await wager.wait();
+            const totalAmount = await this.lottery.connect(g).totalAmount();
+            const w = wager_reciept;
+            const [e] = w.events;
+            // console.log(reciept, wager_reciept);
+            const { to, from, gasUsed, blockHash, transactionHash, blockNumber, cumulativeGasUsed } = reciept;                        
+            process.stdout.write(`(${blockNumber}) ${to} => ${from}` + `(${totalAmount})` + `\n` +
+                `\t` + `(${transactionHash}/${blockHash}) (${gasUsed}/${cumulativeGasUsed})` + `\n`
+            );
+            process.stdout.write(`(${w.blockNumber}) ${e.topics}` + `\n` +
+                `\t` + `${e.eventSignature}` + `\n`);
+        }                                
+    });
+    
+    it("should display gamblers and new balances", async function () {
+        await await this.gamblers.forEach(async (g: SignerWithAddress) => {            
+            process.stdout.write(`${await g.address}:${await g.getBalance()}` + `\n`);
         });
     });
 
-    it("should return gamblers with new winnings distributed", async function () {
-        await this.gamblers.forEach(async (g: SignerWithAddress) => {
-            process.stdout.write(`${await g.address}:${await g.getBalance()}` + `\n`);
-        });
-    })
-
-    
 };
