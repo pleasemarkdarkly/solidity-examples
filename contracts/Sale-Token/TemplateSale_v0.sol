@@ -42,9 +42,9 @@ contract Sale {
     event ReleaseTokens(address from, uint256 amount);
 
     // solhint-disable-next-line
-    uint public EXCHANGE_RATE = 600;
+    uint public EXCHANGE_RATE = 100;
     // solhint-disable-next-line
-    uint public TOTAL_SUPPLY = 5000000000000000000000000;
+    uint public TOTAL_SUPPLY = 10000000000000000000000 * 1000;
 
     constructor(address payable _wallet) {
         startBlock = block.number;
@@ -53,7 +53,7 @@ contract Sale {
         isFunding = true;
         creator = msg.sender;        
         createHeldCoins();
-        exchangeRate = 600;
+        exchangeRate = 100;
         
         console.log("Token Sale Contract created. Starting block:%s", startBlock);
         console.log("Token max supply:%s, %s/per ETH", TOTAL_SUPPLY, exchangeRate);
@@ -114,9 +114,9 @@ contract Sale {
     }
 
     function createHeldCoins() internal {        
-        createHoldToken(msg.sender, 100000000000000000000000);
-        createHoldToken(FOUNDER_GROUP_TWO, 100000000000000000000000);
-        createHoldToken(FOUNDER_GROUP_ONE, 100000000000000000000000);
+        createHoldToken(msg.sender, 10000000000000000000000);
+        createHoldToken(FOUNDER_GROUP_TWO, 10000000000000000000000);
+        createHoldToken(FOUNDER_GROUP_ONE, 10000000000000000000000);
     }
 
     function getHeldCoin(address _address) public payable returns (uint256) {

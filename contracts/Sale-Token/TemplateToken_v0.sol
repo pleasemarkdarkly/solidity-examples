@@ -60,7 +60,7 @@ contract Token is StandardToken {
     string public name = "TEMPLATE ERC20 TOKEN";
     string public symbol = "TEMPLATE";
     string public version = "TEMPLATE 0.1";
-    uint256 public authorizedSupply = 5000000000000000000000000;
+    uint256 public authorizedSupply = 10000000000000000000000 * 1000;
     address payable public mintableAddress;
     uint8 public decimals = 18;
     string public generator = "https://pleasemarkdarkly.github.io/";

@@ -8,7 +8,7 @@ export const getRandomBigNumber = (max: number): BigNumber => {
 }
 
 export function shouldBehaveLikeSale(): void {
-    const MAX_CONTIBUTION_AMOUNT = 100000000;
+    const MAX_CONTRIBUTION_AMOUNT = 1000000; // 10000000000000000000000;
     it("should return token brand, symbol, version, authorized supply", async function () {
         process.stdout.write(`\n`);        
         // await hre.ethers.provider.getBalance(this.proceedsPool.address);
@@ -62,27 +62,18 @@ export function shouldBehaveLikeSale(): void {
     it("should generate random amounts of eth to transfer to Sale Contract", async function () {                                
         process.stdout.write(`\n`);
         const signers: SignerWithAddress[] = await hre.ethers.getSigners();
-        for (let i = 0; i < signers.length; i++) {
+        const sampling = Math.floor(Math.random() * signers.length);
+        for (let i = 1; i < sampling; i++) {
             const a = signers[i];
-            const contribution = getRandomBigNumber(MAX_CONTIBUTION_AMOUNT);
+            const contribution = Math.floor(Math.random() * 10000); // getRandomBigNumber(MAX_CONTRIBUTION_AMOUNT).div(2);
             process.stdout.write(`${await a.address} => ${hre.ethers.utils.parseEther(contribution.toString())} (wei)` + `\n`);
-            /*
-            const tx = await a.sendTransaction({ to: this.sale.address, value: contribution });
-            const contribute = await this.sale.connect(a).contribute();
+            const tx = await this.sale.connect(a).contribute({ value: contribution });
             const receipt = await tx.wait();
-            const contribute_reciept = await contribute.wait();
-            const c = contribute_reciept;                        
-            const { to, from, gasUsed, blockHash, transactionHash, blockNumber, cumulativeGasUsed } = receipt;
-            process.stdout.write(`(${blockNumber}) ${to} => ${from}` + `(${contribution})` + `\n` +
-                `\t` + `(${transactionHash}/${blockHash}) (${gasUsed}/${cumulativeGasUsed})` + `\n`
-            );            
-            if (c.events) {
-                c.events.forEach(e => {
-                    process.stdout.write(`(${c.blockNumber}) ${e.topics}` + `\n` +
-                        `\t` + `${e.eventSignature}` + `\n`);
-                });
-            } 
-            */
+            const { to, from, gasUsed, transactionHash, blockNumber } = receipt;
+            process.stdout.write(`(${blockNumber}) ${from} ➡️ ${to}` + `\n` +
+                `\t` + `🎰 ${contribution} (⛽ ${gasUsed})` + `\n` +
+                `\t` + `(${blockNumber}) ${transactionHash}` + `\n`
+            );
         };
     });
         
@@ -91,8 +82,8 @@ export function shouldBehaveLikeSale(): void {
         const signers: SignerWithAddress[] = await hre.ethers.getSigners();        
         for (let i = 0; i < signers.length; i++) {
             const a = signers[i];
-            const eth = await a.getBalance();
-            process.stdout.write(`${await a.address}:${eth} (eth)` + `\n`);
+            const wei = await a.getBalance();
+            process.stdout.write(`${await a.address}:${wei} (wei)` + `\n`);
         }
         const proceedsBalance = await hre.ethers.provider.getBalance(this.proceedsPool.address);
         process.stdout.write(`Token Sale Proceeds balance:${proceedsBalance}`);
