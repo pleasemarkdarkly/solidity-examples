@@ -29,6 +29,8 @@ export const getRandomBigNumber = (max: number):BigNumber => {
 
 export function shouldBehaveLikeLottery(): void {
     const MAX_WAGER_AMOUNT = 1000;
+    let lotteryAddress = '';
+    let lotteryBalance: BigNumber;
 
     it("should return generator url from lottery", async function () {
         this.lottery.connect(this.signers.admin).on("Log",
@@ -36,10 +38,13 @@ export function shouldBehaveLikeLottery(): void {
             console.log(`==>${lottery} ${gambler}:${wager}-${msg}`);
         });
 
+        lotteryAddress = await this.lottery.address;
+        lotteryBalance = await hre.ethers.provider.getBalance(lotteryAddress);        
         expect(process.stdout.write(`deployed lottery contract to => ` +
-            `${await this.lottery.address}` + `\n`));
+            `${await this.lottery.address}:${lotteryBalance}` + `\n`));
+        expect(await this.lottery.address).to.equal(lotteryAddress);
         expect(process.stdout.write(`generator:` +
-            `${await this.lottery.connect(this.signers.admin).generator()}` + `\n`));
+            `${await this.lottery.connect(this.signers.admin).generator()}` + `\n`));        
     });
 
     it("should transfer random amount between signer 0 and 1", async function () {
@@ -79,36 +84,51 @@ export function shouldBehaveLikeLottery(): void {
     it("should return empty lottery pot/totalAmount", async function () {
         process.stdout.write(`deployed lottery contract to => ${await this.lottery.address} balance:` +
             `${await this.lottery.connect(this.signers.admin).totalAmount()}` + `\n`);
+        lotteryBalance = await hre.ethers.provider.getBalance(lotteryAddress);
+        expect(await this.lottery.connect(this.signers.admin).totalAmount()).to.equal(lotteryBalance);
         process.stdout.write(`\n`);
     });
 
     it("should wager and select winner", async function () {
+        const approxWagers = lotteryBalance;
+        let lotteryTotal;
+        let cumgas;
+
         for (let i = 0; i < this.gamblers.length; i++) {
             const amount = getRandomBigNumber(MAX_WAGER_AMOUNT);
             const g: SignerWithAddress = this.gamblers[i];
             const contract = await this.lottery.connect(g.address).address;
             const tx = await g.sendTransaction({ to: contract, value: amount });
+            approxWagers.add(amount);
             const wager = await this.lottery.connect(g).wager();            
-            const reciept = await tx.wait();
             const wager_reciept = await wager.wait();
+            const reciept = await tx.wait();
             const totalAmount = await this.lottery.connect(g).totalAmount();
+            lotteryTotal = totalAmount;
             const w = wager_reciept;
             const [e] = w.events;
             
-            // console.log(reciept, wager_reciept);
-            
+            // console.log(reciept);
+            // console.log(wager_reciept);
+
             const { to, from, gasUsed, blockHash, transactionHash, blockNumber, cumulativeGasUsed } = reciept;                        
             process.stdout.write(`(${blockNumber}) ${to} => ${from}` + `(${totalAmount})` + `\n` +
                 `\t` + `(${transactionHash}/${blockHash}) (${gasUsed}/${cumulativeGasUsed})` + `\n`
             );
             process.stdout.write(`(${w.blockNumber}) ${e.topics}` + `\n` +
                 `\t` + `${e.eventSignature}` + `\n`);
+            cumgas = cumulativeGasUsed;
         }                                
+        lotteryBalance = await hre.ethers.provider.getBalance(lotteryAddress);
+        process.stdout.write(`Lottery balance:${lotteryBalance}, totalAmount:${lotteryTotal}(${cumgas})` + `\n`);          
     });
     
     it("should display final balances", async function () {
         await await this.gamblers.forEach(async (g: SignerWithAddress) => {            
             process.stdout.write(`${await g.address}:${await g.getBalance()}` + `\n`);
         });
+        
+        lotteryBalance = await hre.ethers.provider.getBalance(lotteryAddress);
+        process.stdout.write(`Lottery balance:${lotteryBalance}`);
     });
 };

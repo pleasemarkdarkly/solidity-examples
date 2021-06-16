@@ -22,8 +22,8 @@ contract Lottery{
     receive () external payable { }
     fallback() external payable {
         console.log("Lottery.fallback:%s:%s", msg.sender, msg.value);
+        wager();        
         emit Log(address(this), msg.sender, msg.value, "fallback");
-        require(msg.value == 0, "Must call wager explicitly");
     }
 
     function wager() public payable joinable{

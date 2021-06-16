@@ -2,8 +2,8 @@ import hre from "hardhat";
 import { Artifact } from "hardhat/types";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 
-import { ChuckNorrisToken } from "../typechain/ChuckNorrisToken";
-import { Signers } from "../types";
+import { ChuckNorrisToken } from "../../typechain/ChuckNorrisToken";
+import { Signers } from "../../types";
 import { shouldBehaveLikeChuckNorris } from './ChuckNorrisToken.behavior';
 
 const { deployContract } = hre.waffle;

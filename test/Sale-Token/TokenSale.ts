@@ -2,8 +2,8 @@ import hre from "hardhat";
 import { expect } from "chai";
 import { Artifact } from "hardhat/types";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
-import { Signers } from "../types";
-import { Sale, Token } from "../typechain";
+import { Signers } from "../../types";
+import { Sale, Token } from "../../typechain";
 
 import { config as dotenvConfig } from 'dotenv';
 import { resolve } from 'path';

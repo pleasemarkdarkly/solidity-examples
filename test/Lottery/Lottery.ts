@@ -2,14 +2,14 @@ import hre from "hardhat";
 import { Artifact } from "hardhat/types";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 
-import { Lottery } from "../typechain/Lottery";
-import { Signers } from "../types";
+import { Lottery } from "../../typechain/Lottery";
+import { Signers } from "../../types";
 import { shouldBehaveLikeLottery } from "./Lottery.behavior";
 
 const { deployContract } = hre.waffle;
 
 describe("Lottery Contract Interaction Example", function () {
-    const gamblerPool = 6;
+    const gamblerPool = 12;
     before(async function () {
         this.signers = {} as Signers;
         const signers: SignerWithAddress[] = await hre.ethers.getSigners();

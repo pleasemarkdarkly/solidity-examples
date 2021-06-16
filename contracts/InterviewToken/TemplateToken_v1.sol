@@ -2,7 +2,6 @@
 pragma solidity ^0.6.0;
 
 // https://ropsten.etherscan.io/address/0xe7b75279244a83f6945c0d012c44d03cdd9f5dd4
-
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract InterviewToken is ERC20 {

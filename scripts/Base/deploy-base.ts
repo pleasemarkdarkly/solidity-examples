@@ -4,7 +4,7 @@ import { Contract } from "@ethersproject/contracts";
 // you'll find the Hardhat Runtime Environment's members available in the global scope.
 import { ethers } from "hardhat";
 
-import { Base__factory } from "../typechain";
+import { Base__factory } from "../../typechain";
 
 async function main(): Promise<void> {
     const BaseContract: Base__factory = await ethers.getContractFactory("Base");

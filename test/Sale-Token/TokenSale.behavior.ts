@@ -1,11 +1,18 @@
 import hre from "hardhat";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
+import { BigNumber } from "ethers";
 import { expect } from "chai";
 
-export function shouldBehaveLikeSale(): void {    
+export const getRandomBigNumber = (max: number): BigNumber => {
+    return hre.ethers.utils.parseUnits(Math.floor(Math.random() * max).toString(), 18);
+}
+
+export function shouldBehaveLikeSale(): void {
+    const MAX_CONTIBUTION_AMOUNT = 10;
     it("should return token brand, symbol, version, authorized supply", async function () {
-        process.stdout.write(`\n`);
-        expect(process.stdout.write(`${await this.token.connect(this.signers.admin).name()}` +
+        process.stdout.write(`\n`);        
+        // await hre.ethers.provider.getBalance(this.proceedsPool.address);
+        expect(process.stdout.write(`${await this.token.connect(this.signers.admin).name()}` +            
             ` (${await this.token.connect(this.signers.admin).symbol()})` +
             ` (${await this.token.connect(this.signers.admin).version()})` +
             `\n`));        
@@ -38,15 +45,18 @@ export function shouldBehaveLikeSale(): void {
     });
         
     it("should return twenty wallets with ether to simulate funding campaign", async function () {
-        const signers: SignerWithAddress[] = await hre.ethers.getSigners();
-        const contribution = `.${Math.floor(Math.random() * 99999999999999999999)}`;
+        const signers: SignerWithAddress[] = await hre.ethers.getSigners();        
         for (let i = 0; i < signers.length; i++) {
             const a = signers[i];
             process.stdout.write(`${await a.address}:${await a.getBalance()}` + `\n`);
+            expect(await a.getBalance()).not.equal(0);
         };
         process.stdout.write(`\n`);
+        /*
+        const contribution = getRandomBigNumber(MAX_CONTIBUTION_AMOUNT);
         expect(process.stdout.write(`Simulation wallets will contribution random amounts:` +
-            `${hre.ethers.utils.parseEther(contribution)}` + `\n`));
+            `${hre.ethers.utils.parseEther(contribution.toString())}` + `\n`));
+            */
     });
         
     it("should generate random amounts of eth to transfer to Sale Contract", async function () {                                
@@ -54,8 +64,25 @@ export function shouldBehaveLikeSale(): void {
         const signers: SignerWithAddress[] = await hre.ethers.getSigners();
         for (let i = 0; i < signers.length; i++) {
             const a = signers[i];
-            const contribution = `.${Math.floor(Math.random() * 1000000000000)}`;
-            process.stdout.write(`${await a.address} => ${hre.ethers.utils.parseEther(contribution)} (wei)` + `\n`);                                        
+            const contribution = getRandomBigNumber(MAX_CONTIBUTION_AMOUNT);
+            process.stdout.write(`${await a.address} => ${hre.ethers.utils.parseEther(contribution.toString())} (wei)` + `\n`);
+            /*
+            const tx = await a.sendTransaction({ to: this.sale.address, value: contribution });
+            const contribute = await this.sale.connect(a).contribute();
+            const receipt = await tx.wait();
+            const contribute_reciept = await contribute.wait();
+            const c = contribute_reciept;                        
+            const { to, from, gasUsed, blockHash, transactionHash, blockNumber, cumulativeGasUsed } = receipt;
+            process.stdout.write(`(${blockNumber}) ${to} => ${from}` + `(${contribution})` + `\n` +
+                `\t` + `(${transactionHash}/${blockHash}) (${gasUsed}/${cumulativeGasUsed})` + `\n`
+            );            
+            if (c.events) {
+                c.events.forEach(e => {
+                    process.stdout.write(`(${c.blockNumber}) ${e.topics}` + `\n` +
+                        `\t` + `${e.eventSignature}` + `\n`);
+                });
+            } 
+            */
         };
     });
         
@@ -67,5 +94,7 @@ export function shouldBehaveLikeSale(): void {
             const eth = await a.getBalance();
             process.stdout.write(`${await a.address}:${eth} (eth)` + `\n`);
         }
+        const proceedsBalance = await hre.ethers.provider.getBalance(this.proceedsPool.address);
+        process.stdout.write(`Token Sale Proceeds balance:${proceedsBalance}`);
     });
 };
