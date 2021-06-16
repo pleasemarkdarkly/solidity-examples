@@ -8,7 +8,7 @@ export const getRandomBigNumber = (max: number): BigNumber => {
 }
 
 export function shouldBehaveLikeSale(): void {
-    const MAX_CONTIBUTION_AMOUNT = 10;
+    const MAX_CONTIBUTION_AMOUNT = 100000000;
     it("should return token brand, symbol, version, authorized supply", async function () {
         process.stdout.write(`\n`);        
         // await hre.ethers.provider.getBalance(this.proceedsPool.address);

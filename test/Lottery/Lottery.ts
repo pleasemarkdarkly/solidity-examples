@@ -8,14 +8,13 @@ import { shouldBehaveLikeLottery } from "./Lottery.behavior";
 
 const { deployContract } = hre.waffle;
 
-describe("Lottery Contract Interaction Example", function () {
-    const gamblerPool = 12;
+describe("Lottery Contract Interaction Example", function () {        
     before(async function () {
         this.signers = {} as Signers;
         const signers: SignerWithAddress[] = await hre.ethers.getSigners();
         this.signers.admin = signers[0];
         this.gamblers = [] as Signers[];
-        for (let i = 1; i <= gamblerPool; i++) {
+        for (let i = 1; i <= (signers.length - 1); i++) {
             const gambler: SignerWithAddress = signers[i];
             this.gamblers.push(gambler);
         }

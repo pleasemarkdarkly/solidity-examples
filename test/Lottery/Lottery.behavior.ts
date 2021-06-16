@@ -10,13 +10,13 @@ export const keys = async (obj: any) => {
     Object.keys(obj).toString().split(`,`).forEach(p => { process.stdout.write(`${p}` + `\n`); })
 }
 
-export const printPartyTxReciept = async (receipt: any) => {
+export const printPartyTxReceipt = async (receipt: any) => {
     process.stdout.write(
         `${receipt.from} => ${receipt.to} (gasUsed:${receipt.gasUsed})(${receipt.status})` + `\n` +
         `\ttx:${receipt.transactionHash} (block.no:${receipt.blockNumber})` + `\n`
     );
 }
-export const printContractTxReciept = async (receipt: any) => {
+export const printContractTxReceipt = async (receipt: any) => {
     process.stdout.write(
         `${receipt.from} => ${receipt.to} (gasUsed:${receipt.gasUsed})(${receipt.status})` + `\n` +
         `\ttx:${receipt.transactionHash} (block.no:${receipt.blockNumber})` + `\n`
@@ -28,7 +28,7 @@ export const getRandomBigNumber = (max: number):BigNumber => {
 }
 
 export function shouldBehaveLikeLottery(): void {
-    const MAX_WAGER_AMOUNT = 1000;
+    const MAX_WAGER_AMOUNT = 100;
     let lotteryAddress = '';
     let lotteryBalance: BigNumber;
 
@@ -58,7 +58,7 @@ export function shouldBehaveLikeLottery(): void {
         process.stdout.write(`(0) ${await sender.address}:${await sender.getBalance()}` + `\n` +
             `(1) ${await reciever.address}:${await reciever.getBalance()}` + `\n`             
         );
-        await printPartyTxReciept(reciept);        
+        await printPartyTxReceipt(reciept);        
     });
     
     it("should return number of players initialized to zero", async function () {
@@ -67,68 +67,72 @@ export function shouldBehaveLikeLottery(): void {
         expect(await this.lottery.connect(this.signers.admin).numOfPlayers()).to.equal(0);
     });
     
-    it("should display players/gamblers addresses and balances", async function () {        
-        this.gamblers.forEach(async (g: SignerWithAddress) => {
-            process.stdout.write(`${await g.address}:${await g.getBalance()}` + `\n`);            
-        });
+    it("should display players/gamblers addresses and balances", async function () {                
+        for (let i = 0; i < this.gamblers.length; i++) {
+            const g: SignerWithAddress = this.gamblers[i];
+            process.stdout.write(`${await g.address}:${await g.getBalance()}` + `\n`);
+        }
         process.stdout.write(`\n`);
     });
     
-    it("should generate random amounts to wager", async function () {                        
-        this.gamblers.forEach(async (g: SignerWithAddress) => {
+    it("should generate random amounts to wager", async function () {                                
+        for (let i = 0; i < this.gamblers.length; i++) {
+            const g: SignerWithAddress = this.gamblers[i];
             const wagerAmount = getRandomBigNumber(MAX_WAGER_AMOUNT);            
-            process.stdout.write(`${await g.address}:${await g.getBalance()}:${wagerAmount} (wei)` + `\n`);            
-        });                    
+            process.stdout.write(`${await g.address}:${await g.getBalance()}:${wagerAmount.div(2)} (wei)` + `\n`);
+        }
+        process.stdout.write(`\n`);
     });
 
     it("should return empty lottery pot/totalAmount", async function () {
         process.stdout.write(`deployed lottery contract to => ${await this.lottery.address} balance:` +
             `${await this.lottery.connect(this.signers.admin).totalAmount()}` + `\n`);
-        lotteryBalance = await hre.ethers.provider.getBalance(lotteryAddress);
+        lotteryBalance = await hre.ethers.provider.getBalance(lotteryAddress);        
         expect(await this.lottery.connect(this.signers.admin).totalAmount()).to.equal(lotteryBalance);
         process.stdout.write(`\n`);
     });
 
-    it("should wager and select winner", async function () {
-        const approxWagers = lotteryBalance;
-        let lotteryTotal;
-        let cumgas;
-
+    it("should wager, select winner, and print contract state", async function () {                                                
+            // 🏆 💰
         for (let i = 0; i < this.gamblers.length; i++) {
-            const amount = getRandomBigNumber(MAX_WAGER_AMOUNT);
-            const g: SignerWithAddress = this.gamblers[i];
-            const contract = await this.lottery.connect(g.address).address;
-            const tx = await g.sendTransaction({ to: contract, value: amount });
-            approxWagers.add(amount);
-            const wager = await this.lottery.connect(g).wager();            
-            const wager_reciept = await wager.wait();
-            const reciept = await tx.wait();
-            const totalAmount = await this.lottery.connect(g).totalAmount();
-            lotteryTotal = totalAmount;
-            const w = wager_reciept;
-            const [e] = w.events;
             
-            // console.log(reciept);
-            // console.log(wager_reciept);
-
-            const { to, from, gasUsed, blockHash, transactionHash, blockNumber, cumulativeGasUsed } = reciept;                        
-            process.stdout.write(`(${blockNumber}) ${to} => ${from}` + `(${totalAmount})` + `\n` +
-                `\t` + `(${transactionHash}/${blockHash}) (${gasUsed}/${cumulativeGasUsed})` + `\n`
-            );
-            process.stdout.write(`(${w.blockNumber}) ${e.topics}` + `\n` +
-                `\t` + `${e.eventSignature}` + `\n`);
-            cumgas = cumulativeGasUsed;
-        }                                
-        lotteryBalance = await hre.ethers.provider.getBalance(lotteryAddress);
-        process.stdout.write(`Lottery balance:${lotteryBalance}, totalAmount:${lotteryTotal}(${cumgas})` + `\n`);          
-    });
-    
-    it("should display final balances", async function () {
-        await await this.gamblers.forEach(async (g: SignerWithAddress) => {            
-            process.stdout.write(`${await g.address}:${await g.getBalance()}` + `\n`);
-        });
+                const g: SignerWithAddress = this.gamblers[i];
+                const wagerAmount = getRandomBigNumber(MAX_WAGER_AMOUNT).div(2);
+                const tx = await this.lottery.connect(g).wager({ value: wagerAmount });
+                const receipt = await tx.wait();
+                // await keys(receipt);            
+                const { to, from, gasUsed, transactionHash, blockNumber } = receipt;
+                process.stdout.write(`(${blockNumber}) ${from} ➡️ ${to}` + `\n` +
+                    `\t` + `🎰 ${wagerAmount} (⛽ ${gasUsed})` + `\n` +
+                    `\t` + `(${blockNumber}) ${transactionHash}` + `\n`
+                );
+        
+                /*
+                let index = 0;
+                if (receipt.events) receipt.events.forEach((e: any) => {
+                    process.stdout.write(`\t\t(${index}) ${e.event}` + `\n`);
+                    index++;
+                    // process.stdout.write(`\n${e.decode}\n`);
+                });                                    
+                index = 0;
+                */            
+        };
         
         lotteryBalance = await hre.ethers.provider.getBalance(lotteryAddress);
+        process.stdout.write(`Lottery contract balance:${lotteryBalance}, ` +
+            `totalAmount:${await this.lottery.totalAmount()}` + `\n`);
+        expect(lotteryBalance).to.equal(await this.lottery.totalAmount());    
+    });
+    
+    it("should display participant's final balances", async function () {                
+        for (let i = 0; i < this.gamblers.length; i++) {
+            const g: SignerWithAddress = this.gamblers[i];            
+            process.stdout.write(`${await g.address}:${await g.getBalance()}` + `\n`);
+        }
+        process.stdout.write(`\n`);
+
+        lotteryBalance = await hre.ethers.provider.getBalance(lotteryAddress);
         process.stdout.write(`Lottery balance:${lotteryBalance}`);
+        expect(lotteryBalance).to.equal(await this.lottery.totalAmount());
     });
 };

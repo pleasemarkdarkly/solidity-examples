@@ -20,11 +20,7 @@ contract Lottery{
     }
 
     receive () external payable { }
-    fallback() external payable {
-        console.log("Lottery.fallback:%s:%s", msg.sender, msg.value);
-        wager();        
-        emit Log(address(this), msg.sender, msg.value, "fallback");
-    }
+    fallback() external payable { }
 
     function wager() public payable joinable{
         emit Log(address(this), msg.sender, msg.value, "wager");
@@ -61,8 +57,11 @@ contract Lottery{
     function selectWinner() private isFinished{        
         emit Log(address(this), msg.sender, msg.value, "selectWinner");
         uint winner = random() % 5;                        
-        payable(players[winner]).transfer(totalAmount);        
-        console.log("Lottery.selectWinner:%s(%s), %s", players[winner], winner, totalAmount);
+        payable(players[winner]).transfer(totalAmount);               
+        console.log(""); 
+        console.log("Lottery (selectWinner): randomIndex:%s", winner);
+        console.log("%s won %s", players[winner], totalAmount);
+        console.log("");
         state = State.Paid;
         restart();
     }
